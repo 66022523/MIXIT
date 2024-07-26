@@ -1,7 +1,12 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState, Fragment } from "react";
-import { Bars3BottomLeftIcon, ChevronRightIcon, FireIcon, UserGroupIcon } from "@heroicons/react/24/solid";
+import {
+  Bars3BottomLeftIcon,
+  ChevronRightIcon,
+  FireIcon,
+  UserGroupIcon,
+} from "@heroicons/react/24/solid";
 
 import Circle from "@/components/circle";
 import Post from "@/components/post";
@@ -77,11 +82,15 @@ export default function Home({ circles, posts, tags }) {
             <div className="h-80 rounded-xl bg-gradient-to-t from-blue-500 to-base-100 p-2">
               <div
                 className="hero h-full place-items-end overflow-hidden rounded-xl"
-                style={{
-                  backgroundImage: `url(${circle.cover_url})`,
-                }}
+                style={
+                  circle.cover_url
+                    ? {
+                        backgroundImage: `url(${circle.cover_url})`,
+                      }
+                    : null
+                }
               >
-                <div className="hero-overlay bg-transparent bg-gradient-to-t from-base-100 to-transparent"></div>
+                <div className="hero-overlay bg-transparent bg-gradient-to-t from-base-100 to-transparent" />
                 <div className="hero-content p-5">
                   <div className="max-w-md">
                     <h3 className="mb-3 text-xl font-bold">
