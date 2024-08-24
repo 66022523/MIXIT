@@ -8,7 +8,7 @@ import { Tag, TagPlaceholder } from "./tag";
 import { EmptyPlaceholder } from "./error";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
-const { createClient } = require("@/utils/supabase/component");
+import { createClient } from "@/utils/supabase/component";
 
 export default function Sidebar() {
   const supabase = createClient();

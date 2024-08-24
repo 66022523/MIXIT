@@ -17,7 +17,7 @@ import { SessionContext } from "@/contexts/session";
 
 import useUser from "@/hooks/useUser";
 
-const { createClient } = require("@/utils/supabase/component");
+import { createClient } from "@/utils/supabase/component";
 
 const DynamicAuthSignInModal = dynamic(
   () => import("./auth").then((auth) => auth.AuthSignInModal),

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const { createClient } = require("@/utils/supabase/component");
+import { createClient } from "@/utils/supabase/component";
 
 export function CirclePlaceholder({ skeleton }) {
   return (
