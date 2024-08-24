@@ -6,10 +6,28 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const { data } = await supabase.from("circles").select();
+        const { data, error } = await supabase.from("circles").select();
+
+        if (!data)
+          return res
+            .status(404)
+            .json({
+              message: "Currently, there is no information on any circles.",
+              error,
+            });
+        if (error)
+          return res
+            .status(500)
+            .json({
+              message: "An error occurred while retrieving data.",
+              error,
+            });
+
         return res.status(200).json(data);
       } catch (error) {
-        return res.status(500).json({ message: "Failed to fetch data", error });
+        return res
+          .status(500)
+          .json({ message: "Internal server error", error });
       }
     default:
       return res
