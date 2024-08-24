@@ -8,7 +8,16 @@ export default async function handler(req, res) {
       try {
         const { data: users, error } = await supabase.from("users").select();
 
-        if (error) throw error;
+        if (!users)
+          return res.status(404).json({
+            message: "No user information is available at the moment.",
+            error,
+          });
+        if (error)
+          return res.status(500).json({
+            message: "An error occurred while retrieving data.",
+            error,
+          });
 
         return res.status(200).json(users);
       } catch (error) {
