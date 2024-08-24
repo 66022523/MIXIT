@@ -5,9 +5,6 @@ export function createClient({ req, res }) {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
-      db: {
-        schema: process.env.NODE_ENV === "production" ? "public" : "private",
-      },
       cookies: {
         getAll() {
           return Object.keys(req.cookies).map((name) => ({
