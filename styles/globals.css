@@ -2,19 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .overflow-invisible::-webkit-scrollbar {
-    display: none;
+@layer base {
+  html {
+    @apply scroll-smooth;
+    scrollbar-gutter: auto !important;
   }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .overflow-invisible {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+  h4 {
+    @apply text-base;
+  }
+  h5 {
+    @apply text-sm;
+  }
+  h6 {
+    @apply text-xs;
   }
 }
 
-html, body {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+
+@layer utilities {
+  .overflow-invisible::-webkit-scrollbar {
+    display: none;
+  }
+  .overflow-invisible {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* DaisyUI */
+.modal {
+  @apply backdrop-blur;
+}
+
+/* NProgress */
+#nprogress .bar {
+  @apply rounded-full;
+  @apply bg-primary;
+  @apply z-[9999];
+  @apply h-[3px];
+}
+#nprogress .peg {
+  @apply rounded-full;
+  @apply shadow-[0_0_15px_oklch(var(--p)),_0_0_10px_oklch(var(--p))];
+}
+#nprogress .spinner-icon {
+  @apply border-t-primary;
+  @apply border-l-primary;
+}
+
+/* Hightlight.js */
+.hljs-attr {
+  @apply text-primary;
+}
+.hljs-literal {
+  @apply text-error;
+}
+.hljs-string,
+.hljs-section .hljs-selector-class,
+.hljs-template-variable,
+.hljs-deletion {
+  @apply text-info;
+}
+.hljs,
+.hljs-strong,
+.hljs-emphasis,
+.hljs-subst {
+  @apply text-primary-content;
+}
+.hljs-section,
+.hljs-strong {
+  @apply font-bold;
+}
+.hljs-emphasis {
+  @apply italic;
 }
