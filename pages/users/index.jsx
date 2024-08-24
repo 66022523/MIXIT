@@ -149,7 +149,7 @@ export default function Users({ fallback }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const users = await fetcher("http://localhost:3000/api/v1/users");
   return {
     props: {

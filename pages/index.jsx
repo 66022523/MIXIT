@@ -133,7 +133,7 @@ export default function Home({ fallback }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const circles = await fetcher("http://localhost:3000/api/v1/circles");
   const posts = await fetcher("http://localhost:3000/api/v1/posts");
   const tags = await fetcher("http://localhost:3000/api/v1/tags");
@@ -146,6 +146,5 @@ export async function getStaticProps() {
         "/api/v1/tags": tags,
       },
     },
-    revalidate: 10,
   };
 }
