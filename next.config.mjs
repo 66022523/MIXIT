@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["react-daisyui"],
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -10,14 +11,14 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "wutheringwaves.kurogames.com",
+        hostname: "ovscodhpteobdvvqsdvr.supabase.co",
         pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "maseshi.web.app",
+        hostname: "lh3.googleusercontent.com",
         pathname: "/**",
-      }
+      },
     ],
   },
 };
