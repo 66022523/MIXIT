@@ -6,59 +6,41 @@ export default async function handler(req, res) {
   switch (req.method) {
     case "GET":
       try {
-        const { data: posts, error } = await supabase.from("posts").select();
-
-        if (error) throw error;
-        if (!posts?.length) return res.status(200).json([]);
-
-        const result = await Promise.all(
-          posts.map(async (post) => {
-            const { data: user, error: userError } = await supabase
-              .from("users")
-              .select()
-              .eq("id", post.writer_id)
-              .single();
-
-            if (userError) throw userError;
-
-            const { data: comments, error: commentsError } = await supabase
-              .from("comments")
-              .select("*, comments (*)")
-              .eq("post_id", post.id)
-              .order("created_at", { ascending: false })
-              .is("comment_id", null);
-
-            if (commentsError) throw commentsError;
-
-            const { data: circle, error: circleError } = await supabase
-              .from("circles")
-              .select()
-              .eq("id", post.circle_id)
-              .single();
-
-            if (circleError) throw circleError;
-
-            const { data: tags, error: tagsError } = await supabase
-              .from("posts")
-              .select("id, tags (id, name)");
-
-            if (tagsError) throw tagsError;
-
-            ["writer_id", "circle_id"].forEach((key) => delete post[key]);
-
-            return {
-              ...post,
-              writer: user,
-              circle: circle,
-              comments: comments,
-              tags: tags[0].tags,
-            };
-          }),
+        const { data, error } = await supabase.from("posts").select(
+          `
+            id,
+            created_at,
+            deleted,
+            deleted_at,
+            nsfw,
+            title,
+            content,
+            history,
+            tags (*),
+            images,
+            views (users!views_user_id_fkey (*)),
+            likes (users!likes_user_id_fkey (*)),
+            comments (*),
+            shares (users!shares_user_id_fkey (*)),
+            writer:users!posts_writer_id_fkey (*),
+            circle:circles!posts_circle_id_fkey (*)
+          `,
         );
 
-        return res.status(200).json(result);
+        if (!data)
+          return res.status(404).json({
+            message: "There are no posts yet.",
+            error,
+          });
+        if (error)
+          return res.status(500).json({
+            message: "An error occurred while retrieving data.",
+            error,
+          });
+
+        return res.status(200).json(data);
       } catch (error) {
-        return res.status(500).json({ message: "Failed to fetch data", error });
+        return res.status(500).json(error);
       }
     default:
       return res
