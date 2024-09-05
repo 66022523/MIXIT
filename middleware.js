@@ -5,7 +5,6 @@ export async function middleware(request) {
   let response = NextResponse.next({
     request,
   });
-  let redirect = null;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -40,9 +39,7 @@ export async function middleware(request) {
       request.nextUrl.pathname.startsWith("/settings/security") ||
       request.nextUrl.pathname.startsWith("/settings/account"))
   ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/settings";
-    redirect = url;
+    return NextResponse.redirect(new URL("/settings", request.url));
   }
 
   supabase.auth.onAuthStateChange((event, _session) => {
@@ -50,13 +47,10 @@ export async function middleware(request) {
       event !== "PASSWORD_RECOVERY" &&
       request.nextUrl.pathname.startsWith("/recovery")
     ) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      redirect = url;
+      return NextResponse.redirect(new URL("/", request.url));
     }
   });
 
-  if (redirect) return NextResponse.redirect(redirect);
   return response;
 }
 
