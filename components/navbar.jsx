@@ -3,16 +3,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import {
-  Navbar,
-  BottomNavigation,
-  Dropdown,
-  Button,
-  Menu,
-  Input,
-  Skeleton,
-  Join,
-} from "react-daisyui";
-import {
   TagIcon,
   FunnelIcon,
   Bars3BottomLeftIcon,
@@ -32,9 +22,10 @@ import {
   HomeIcon,
   FireIcon,
   ChevronRightIcon,
+  WindowIcon,
 } from "@heroicons/react/24/outline";
 
-import Favicon from "./favicon";
+import { Favicon } from "./content";
 
 import { SessionContext } from "@/contexts/session";
 
@@ -42,10 +33,13 @@ import useUser from "@/hooks/useUser";
 
 import { createClient } from "@/utils/supabase/component";
 
-export function TopNavbar({ handleToggleDrawerVisible }) {
+export function TopNavbar() {
+  const supabase = createClient();
   const router = useRouter();
   const session = useContext(SessionContext);
+
   const { data: user, error, isLoading } = useUser(session?.user.id);
+
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
   const [theme, setTheme] = useState(
@@ -54,7 +48,6 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
       "default",
   );
 
-  const supabase = createClient();
   const pages = [
     {
       name: "Circles",
@@ -133,36 +126,36 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
   );
 
   return (
-    <Navbar className="bg-base-100/80 backdrop-blur-3xl">
+    <nav className="navbar bg-base-100/80 backdrop-blur-3xl">
       <div className="flex-none">
-        <Menu horizontal className="hidden px-1 lg:flex">
+        <ul className="menu hidden px-1 lg:menu-horizontal">
           {pages.map((page, index) => (
-            <Menu.Item key={index}>
+            <li key={index}>
               <Link href={page.href}>{page.name}</Link>
-            </Menu.Item>
+            </li>
           ))}
-        </Menu>
-        <Button
-          color="ghost"
-          className="lg:hidden"
-          onClick={handleToggleDrawerVisible}
+        </ul>
+        <label
+          htmlFor="sidebar-drawer"
+          className="btn btn-ghost drawer-button lg:hidden"
         >
           <ChevronRightIcon className="size-5" />
-        </Button>
+        </label>
       </div>
-      <div className="flex-1 justify-center">
+      <div className="flex-1 items-center justify-center">
         <Favicon className="btn btn-ghost inline-flex text-xl text-primary lg:hidden" />
-        <Join className="rounded-full bg-primary p-1">
-          <Dropdown>
-            <Dropdown.Toggle
-              button={false}
+        <div className="join hidden rounded-full bg-primary p-1 lg:inline-flex">
+          <div className="dropdown">
+            <div
+              tabIndex={0}
+              role="button"
               className="btn btn-circle join-item btn-sm"
             >
               <FunnelIcon className="size-5" />
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="menu-sm z-[1] mt-6 w-52">
+            </div>
+            <ul className="menu dropdown-content menu-sm z-[1] mt-6 w-52 rounded-box bg-base-100 shadow">
               {searchOptions.map((option, index) => (
-                <Menu.Item key={index}>
+                <li key={index}>
                   <button
                     onClick={() => setSearchFilter(option.value)}
                     className={searchFilter === option.name ? "active" : ""}
@@ -170,60 +163,57 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
                     {option.icon}
                     {option.name}
                   </button>
-                </Menu.Item>
+                </li>
               ))}
-            </Dropdown.Menu>
-          </Dropdown>
+            </ul>
+          </div>
           <div className="form-control w-full">
-            <Input
+            <input
               type="search"
-              size="sm"
-              color="ghost"
-              className="join-item bg-transparent border-transparent placeholder:text-primary-content focus:border-transparent focus:bg-transparent focus:outline-none"
+              className="input input-sm join-item input-ghost border-transparent bg-transparent placeholder:text-primary-content focus:border-transparent focus:bg-transparent focus:outline-none"
               placeholder="Start to search everything..."
               value={searchKeyword}
               onChange={(event) => setSearchKeyword(event.target.value)}
             />
           </div>
-          <Button
-            shape="circle"
-            size="sm"
-            color="ghost"
-            className="join-item text-primary-content"
+          <button
+            className="btn btn-circle btn-ghost join-item btn-sm text-primary-content"
             onClick={handleSearch}
           >
             <MagnifyingGlassIcon className="size-5" />
-          </Button>
-        </Join>
+          </button>
+        </div>
       </div>
       <div className="flex-none">
-        <Button shape="circle" color="ghost" className="hidden lg:inline-flex">
+        <button className="btn btn-circle btn-ghost hidden lg:inline-flex">
           <PencilIcon className="size-5" />
-        </Button>
-        <Button shape="circle" color="ghost" className="hidden lg:inline-flex">
-          <div className="indicator">
+        </button>
+        <div className="dropdown dropdown-end hidden lg:block">
+          <div tabIndex={0} role="button" className="btn btn-circle btn-ghost">
             <BellIcon className="size-5" />
             {/* <span className="badge indicator-item badge-primary badge-xs" /> */}
           </div>
-        </Button>
-        <Dropdown className="hidden lg:block" end>
-          <Button
-            tag="label"
+          <div
             tabIndex={0}
-            color={
+            className="card dropdown-content card-compact mt-4 w-80 bg-base-100 p-2 shadow"
+          >
+            <div className="card-body">
+              <h3 className="card-title">Notifications</h3>
+              <p>you can use any element as a dropdown.</p>
+            </div>
+          </div>
+        </div>
+        <div className="dropdown dropdown-end hidden lg:block">
+          <div
+            tabIndex={0}
+            role="button"
+            className={`btn btn-circle ${
               session
                 ? !isLoading && user?.avatar_url
-                  ? "ghost"
-                  : "neutral"
-                : "primary"
-            }
-            shape="circle"
-            className={
-              session
-                ? "avatar" +
-                  (!isLoading && user?.avatar_url ? "" : " placeholder")
-                : "avatar"
-            }
+                  ? "btn-ghost"
+                  : "btn-neutral"
+                : "btn-primary"
+            } avatar ${session && !isLoading && user?.avatar_url ? "" : "placeholder"}`}
           >
             {session ? (
               <div className="w-10 rounded-full">
@@ -235,31 +225,40 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
                     height={40}
                   />
                 ) : (
-                  <span>{!isLoading && user?.nickname.charAt(0)}</span>
+                  <span>{!isLoading && user?.nickname?.charAt(0)}</span>
                 )}
               </div>
             ) : (
               <UserIcon className="size-5" />
             )}
-          </Button>
-          <Dropdown.Menu className="menu-sm z-[1] mt-4 w-52">
+          </div>
+          <ul className="menu dropdown-content menu-sm z-[1] mt-4 w-52 rounded-box bg-base-100 p-2 shadow">
             {session ? (
               <>
-                <Menu.Title>
+                <li
+                  className={`menu-title ${user?.role?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
+                >
                   {isLoading ? (
-                    <Skeleton className="h-4 w-20" />
+                    <div className="skeleton h-4 w-20" />
                   ) : (
                     user?.nickname
                   )}
-                </Menu.Title>
-                <Menu.Item>
+                </li>
+                {user?.role?.toLowerCase() === "admin" && (
+                  <li>
+                    <Link href="/dashboard">
+                      <WindowIcon className="size-5" /> Dashboard
+                    </Link>
+                  </li>
+                )}
+                <li>
                   <Link href={`/users/${session.user.id}`}>
                     <IdentificationIcon className="size-5" /> Profile
                   </Link>
-                </Menu.Item>
+                </li>
               </>
             ) : (
-              <Menu.Item>
+              <li>
                 <button
                   type="button"
                   className="text-primary"
@@ -267,38 +266,37 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
                 >
                   <ArrowRightEndOnRectangleIcon className="size-5" /> Sign in
                 </button>
-              </Menu.Item>
+              </li>
             )}
-            <Menu.Item>
-              <Menu.Details
-                label={
-                  <>
-                    <SwatchIcon className="size-5" /> Theme
-                  </>
-                }
-              >
-                {themeOptions.map((option, index) => (
-                  <Menu.Item key={index}>
-                    <input
-                      type="radio"
-                      name="theme"
-                      className="theme-controller btn btn-ghost btn-sm btn-block justify-start"
-                      aria-label={option.name}
-                      value={option.value}
-                      checked={theme === option.value}
-                      onChange={(event) => setTheme(event.target.value)}
-                    />
-                  </Menu.Item>
-                ))}
-              </Menu.Details>
-            </Menu.Item>
-            <Menu.Item>
-              <button type="button">
+            <li>
+              <details>
+                <summary>
+                  <SwatchIcon className="size-5" /> Theme
+                </summary>
+                <ul>
+                  {themeOptions.map((option, index) => (
+                    <li key={index}>
+                      <input
+                        type="radio"
+                        name="theme"
+                        className="theme-controller btn btn-ghost btn-sm btn-block justify-start"
+                        aria-label={option.name}
+                        value={option.value}
+                        checked={theme === option.value}
+                        onChange={(event) => setTheme(event.target.value)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+            <li>
+              <Link href="/settings">
                 <Cog6ToothIcon className="size-5" /> Settings
-              </button>
-            </Menu.Item>
+              </Link>
+            </li>
             {session && (
-              <Menu.Item>
+              <li>
                 <button
                   type="button"
                   className="text-error"
@@ -306,27 +304,31 @@ export function TopNavbar({ handleToggleDrawerVisible }) {
                 >
                   <ArrowRightStartOnRectangleIcon className="size-5" /> Sign out
                 </button>
-              </Menu.Item>
+              </li>
             )}
-          </Dropdown.Menu>
-        </Dropdown>
-        <Dropdown end>
-          <Button tag="label" color="ghost" tabIndex={0} className="lg:hidden">
-            <Bars3BottomRightIcon className="size-5" />
-          </Button>
-          <Dropdown.Menu
+          </ul>
+        </div>
+        <div className="dropdown dropdown-end">
+          <div
             tabIndex={0}
-            className="menu-sm z-[1] mt-3 w-52 lg:hidden"
+            role="button"
+            className="btn btn-circle btn-ghost lg:hidden"
+          >
+            <Bars3BottomRightIcon className="size-5" />
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu dropdown-content menu-sm z-[1] mt-4 w-52 rounded-box bg-base-100 p-2 shadow lg:hidden"
           >
             {pages.map((page, index) => (
-              <Menu.Item key={index}>
+              <li key={index}>
                 <Link href={page.href}>{page.name}</Link>
-              </Menu.Item>
+              </li>
             ))}
-          </Dropdown.Menu>
-        </Dropdown>
+          </ul>
+        </div>
       </div>
-    </Navbar>
+    </nav>
   );
 }
 
@@ -339,41 +341,36 @@ export function BottomNavbar() {
   };
 
   return (
-    <BottomNavigation className="relative bg-base-100/80 backdrop-blur-3xl">
-      <BottomNavigation.Item
-        onClick={() => router.push(`/`)}
-        className="bg-opacity-50"
-        color={router.pathname === `/` ? "primary" : ""}
-        active={router.pathname === `/`}
+    <div className="btm-nav relative bg-base-100/80 backdrop-blur-3xl">
+      <Link
+        href="/"
+        className={`${router.pathname === "/" ? "active text-primary" : ""} bg-opacity-50`}
       >
         <HomeIcon className="size-5" />
-      </BottomNavigation.Item>
-      <BottomNavigation.Item
-        onClick={() => router.push(`/tags`)}
-        className="bg-opacity-50"
-        color={router.pathname === `/tags` ? "primary" : ""}
-        active={router.pathname === `/tags`}
+      </Link>
+      <Link
+        href="/tags"
+        className={`${router.pathname === "/tags" ? "active text-primary" : ""} bg-opacity-50`}
       >
         <FireIcon className="size-5" />
-      </BottomNavigation.Item>
-      <BottomNavigation.Item className="bg-opacity-50">
+      </Link>
+      <button type="button" className="bg-opacity-50">
         <PencilIcon className="size-5" />
-      </BottomNavigation.Item>
-      <BottomNavigation.Item className="bg-opacity-50">
+      </button>
+      <button type="button" className="bg-opacity-50">
         <BellIcon className="size-5" />
-      </BottomNavigation.Item>
-      <BottomNavigation.Item
+      </button>
+      <button
+        type="button"
         onClick={() =>
           session
             ? router.push(`/users/${session.user.id}`)
             : handleShowSignInModal
         }
-        className="bg-opacity-50"
-        color={router.pathname === `/users/[id]` ? "primary" : ""}
-        active={router.pathname === `/users/[id]`}
+        className={`${router.pathname === "/users/[id]" ? "active text-primary" : ""} bg-opacity-50`}
       >
         <UserIcon className="size-5" />
-      </BottomNavigation.Item>
-    </BottomNavigation>
+      </button>
+    </div>
   );
 }
