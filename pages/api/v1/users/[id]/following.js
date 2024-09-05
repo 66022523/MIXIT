@@ -22,7 +22,7 @@ export default async function handler(req, res) {
             error,
           });
 
-        return res.status(200).json(data);
+        return res.status(200).json(data.flatMap(({ user }) => user));
       } catch (error) {
         return res
           .status(500)
