@@ -41,7 +41,7 @@ function AuthModal({ id, description, children }) {
 
   return (
     <dialog id={id} className="modal backdrop-blur">
-      <div className="overflow-invisible modal-box rounded-badge bg-opacity-80">
+      <div className="overflow-invisible text-center modal-box rounded-badge bg-opacity-80">
         <div className="flex justify-end gap-2">
           <button className="btn btn-circle btn-primary btn-sm">
             <QuestionMarkCircleIcon className="size-6" />
@@ -52,8 +52,8 @@ function AuthModal({ id, description, children }) {
             </button>
           </form>
         </div>
-        <Favicon className="btn btn-ghost text-center text-4xl font-bold text-primary" />
-        <p className="text-center">{description}</p>
+        <Favicon className="btn btn-ghost text-4xl font-bold text-primary" />
+        <p>{description}</p>
         <br />
         {children}
         <div className="divider">Social Media</div>
