@@ -2,32 +2,18 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState, useContext, Fragment, useEffect } from "react";
+import { useState, useContext, Fragment } from "react";
 import useSWR, { SWRConfig } from "swr";
-import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  EyeSlashIcon,
-  FunnelIcon,
-  MapPinIcon,
-  PencilIcon,
-  PencilSquareIcon,
-  TagIcon,
-  UserGroupIcon,
-  UserIcon,
-  UsersIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
-import { allCountries } from "country-region-data";
+import { EyeSlashIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { UsersIcon, UserGroupIcon } from "@heroicons/react/24/solid";
 
 import { CircleTall } from "@/components/circle";
-import { NotFound, Empty } from "@/components/error";
-import { PostTall } from "@/components/post";
+import { NotFound, Empty } from "@/components/content";
 import { CommentTall } from "@/components/comments";
+import { PostTall } from "@/components/post";
 
 import { SessionContext } from "@/contexts/session";
 
-import { createClient } from "@/utils/supabase/component";
 import { fetcher } from "@/utils/fetcher";
 
 function UserTabCircles() {
@@ -64,8 +50,8 @@ function UserTabPosts() {
         data.map((post, index) => (
           <PostTall
             id={post.id}
-            imagesSource={post.images[0].source}
-            imagesAlternate={post.images[0].alternate}
+            imagesSource={post.images?.[0].source}
+            imagesAlternate={post.images?.[0].alternate}
             title={post.title}
             content={post.content}
             key={index}
@@ -184,7 +170,6 @@ function UserTabReports() {
 
 function Component() {
   const router = useRouter();
-  const supabase = createClient();
   const session = useContext(SessionContext);
 
   const { data: user } = useSWR(`/api/v1/users/${router.query.id}`);
@@ -196,17 +181,7 @@ function Component() {
   );
 
   const [active, setActive] = useState(0);
-  const [cover, setCover] = useState(user.cover_url || "");
-  const [avatar, setAvatar] = useState(user.avatar_url || "");
   const [copied, setCopied] = useState(false);
-  const [nickname, setNickname] = useState(
-    user.nickname || session?.user.raw_metadata?.nickname || "",
-  );
-  const [pronoun, setPronoun] = useState(user.pronouns || "Do not specified");
-  const [country, setCountry] = useState(user.country || "Do not specified");
-  const [signature, setSignature] = useState(user.signature || "");
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: "", message: "" });
 
   const tabs = [
     {
@@ -246,100 +221,13 @@ function Component() {
       Component: UserTabReports,
     },
   ];
-  const maxNicknameLength = 20;
-  const pronouns = [
-    {
-      name: "He/Him",
-      value: "He/Him",
-    },
-    {
-      name: "She/Her",
-      value: "She/Her",
-    },
-    {
-      name: "They/Them",
-      value: "They/Them",
-    },
-  ];
-  const maxSignatureLength = 256;
 
   const handleCopyUID = () => {
     navigator.clipboard.writeText(user.id);
     setCopied(true);
   };
-  const handleShowEditProfileModal = () => {
-    document.getElementById("user-edit-profile-modal").showModal();
-  };
-  const handleUpdateProfile = async () => {
-    let newCoverURL = null,
-      newAvatarURL = null;
-    const updateStatus = (isLoading, type, message) => {
-      setLoading(isLoading);
-      setStatus({ type: type, message: message });
-      setTimeout(() => setStatus({ type: "", message: "" }), 3000);
-    };
-
-    updateStatus(true, "", "");
-
-    // Upload and download user cover and avatar to storage
-    if (cover !== user.cover_url) {
-      const { error: coverUploadError } = await supabase.storage
-        .from("users")
-        .upload(`${session.user.id}/cover.png`, cover, {
-          upsert: true,
-        });
-
-      if (coverUploadError) updateStatus(false, "error", coverUploadError);
-
-      const { data: coverDownloadData, error: coverDownloadError } =
-        await supabase.storage
-          .from("users")
-          .getPublicUrl(`${session.user.id}/cover.png`);
-
-      if (coverDownloadError) updateStatus(false, "error", coverDownloadError);
-
-      newCoverURL = coverDownloadData.publicUrl;
-    }
-    if (avatar !== user.avatar_url) {
-      const { error: avatarUploadError } = await supabase.storage
-        .from("users")
-        .upload(`${session.user.id}/avatar.png`, avatar, {
-          upsert: true,
-        });
-
-      if (avatarUploadError) updateStatus(false, "error", avatarUploadError);
-
-      const { data: avatarDownloadData, error: avatarDownloadError } =
-        await supabase.storage
-          .from("users")
-          .getPublicUrl(`${session.user.id}/avatar.png`, {
-            transform: {
-              width: 100,
-              height: 100,
-            },
-          });
-
-      if (avatarDownloadError)
-        updateStatus(false, "error", avatarDownloadError);
-
-      newAvatarURL = avatarDownloadData.publicUrl;
-    }
-
-    // Update user profile to database
-    const { error: userUpdateError } = await supabase
-      .from("users")
-      .update({
-        cover_url: newCoverURL || cover,
-        avatar_url: newAvatarURL || avatar,
-        nickname: nickname,
-        pronouns: pronoun,
-        country: country,
-        signature: signature,
-      })
-      .eq("id", session.user.id);
-
-    if (userUpdateError) updateStatus(false, "error", userUpdateError);
-    updateStatus(false, "success", "");
+  const handleShowSignInModal = () => {
+    document.getElementById("auth-sign-in").showModal();
   };
 
   return (
@@ -357,20 +245,24 @@ function Component() {
       {user.error ? (
         <div className="hero h-full">
           <div className="hero-content text-center">
-            <NotFound description={user.message} error={user.error} />
+            <NotFound
+              iconCenter
+              description={user.message}
+              error={user.error}
+            />
           </div>
         </div>
       ) : (
         <div className="container relative mx-auto min-h-screen">
-          <div
-            className="hero h-72 overflow-clip rounded-2xl bg-base-300 bg-fixed bg-no-repeat"
-            style={{
-              backgroundImage: `url(${user.cover_url || "/assets/images/random-shapes.svg"})`,
-            }}
-          >
-            <div className="hero-overlay bg-opacity-0 bg-gradient-to-b from-transparent to-base-300" />
-          </div>
-          <div className="absolute top-56 grid w-full grid-cols-2 justify-between px-12">
+            <div
+              className="hero h-80 overflow-clip rounded-2xl bg-base-300 bg-fixed bg-cover text-base-100"
+              style={{
+                backgroundImage: `url(${user.cover_url || "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM0 72h40v4H0v-4zm0-8h31v4H0v-4zm20-16h20v4H20v-4zM0 56h40v4H0v-4zm63-25a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM53 41a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-30 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-28-8a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zM56 5a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zm-3 46a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 0l5 20H16l5-20zm43 64v-4h-4v4h-4v4h4v4h4v-4h4v-4h-4zM36 13h4v4h-4v-4zm4 4h4v4h-4v-4zm-4 4h4v4h-4v-4zm8-8h4v4h-4v-4z'/%3E%3C/g%3E%3C/svg%3E\""})`,
+              }}
+            >
+              <div className="hero-overlay bg-opacity-0 bg-gradient-to-b from-transparent to-base-300" />
+            </div>
+          <div className="absolute top-64 grid w-full grid-cols-2 justify-between px-12">
             <div className="flex gap-4">
               <div className={`avatar ${user.avatar_url ? "" : "placeholder"}`}>
                 <div
@@ -425,234 +317,13 @@ function Component() {
             </div>
             <div className="text-end">
               {session?.user.id === user.id ? (
-                <>
-                  <button className="btn" onClick={handleShowEditProfileModal}>
-                    Edit Profile
-                  </button>
-                  <dialog
-                    id="user-edit-profile-modal"
-                    className="modal text-start"
-                  >
-                    <div className="modal-box space-y-4 text-center">
-                      <h3 className="text-left text-lg font-bold">Profile</h3>
-                      <p className="text-left">
-                        Some changes to the information may take a few minutes.
-                      </p>
-                      <div
-                        className="hero h-40 overflow-clip rounded-box bg-base-300"
-                        style={{
-                          backgroundImage: `url(${cover || "/assets/images/random-shapes.svg"})`,
-                        }}
-                      >
-                        <div className="hero-overlay bg-opacity-60" />
-                        <div className="hero-content text-center text-neutral-content">
-                          <label className="btn btn-circle">
-                            <input
-                              type="file"
-                              onChange={(event) =>
-                                setCover(
-                                  URL.createObjectURL(event.target.files[0]),
-                                )
-                              }
-                              accept="image/*"
-                              hidden
-                            />
-                            <PencilSquareIcon className="size-4" />
-                          </label>
-                        </div>
-                      </div>
-                      <div className={`avatar ${avatar ? "" : "placeholder"}`}>
-                        <div
-                          className={`w-20 rounded-full ${avatar ? "" : "bg-neutral text-neutral-content"}`}
-                        >
-                          {avatar ? (
-                            <Image
-                              src={avatar}
-                              alt={user.nickname}
-                              width={80}
-                              height={80}
-                            />
-                          ) : (
-                            <span className="text-3xl">
-                              {user.nickname.charAt(0)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="join">
-                          <label className="btn btn-primary">
-                            <input
-                              type="file"
-                              onChange={(event) =>
-                                setAvatar(
-                                  URL.createObjectURL(event.target.files[0]),
-                                )
-                              }
-                              className="file-input join-item file-input-bordered w-full max-w-xs"
-                              accept="image/*"
-                              hidden
-                            />
-                            Change Avatar
-                          </label>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <label className="form-control w-full">
-                          <div className="label">
-                            <span className="label-text flex items-center gap-1">
-                              <TagIcon className="size-4" />
-                              Nickname
-                            </span>
-                          </div>
-                          <input
-                            type="text"
-                            placeholder="Type your nickname here"
-                            className="input input-bordered w-full"
-                            value={nickname}
-                            onChange={(event) =>
-                              setNickname(event.target.value)
-                            }
-                            maxLength={maxNicknameLength}
-                          />
-                          <div className="label">
-                            <span className="label-text-alt" />
-                            <span className="label-text-alt">
-                              {maxNicknameLength - nickname.length} /{" "}
-                              {maxNicknameLength}
-                            </span>
-                          </div>
-                        </label>
-                        <label className="form-control w-full">
-                          <div className="label">
-                            <span className="label-text flex items-center gap-1">
-                              <UserIcon className="size-4" />
-                              Pronouns
-                            </span>
-                          </div>
-                          <select
-                            className="select select-bordered"
-                            value={pronoun}
-                            onChange={(event) => setPronoun(event.target.value)}
-                          >
-                            <option value="Do not specified">
-                              Don&apos;t specified
-                            </option>
-                            {pronouns.map((pronoun, index) => (
-                              <option value={pronoun.value} key={index}>
-                                {pronoun.name}
-                              </option>
-                            ))}
-                            <option value="Custom">Custom</option>
-                          </select>
-                        </label>
-                      </div>
-                      <label className="form-control w-full">
-                        <div className="label">
-                          <span className="label-text flex items-center gap-1">
-                            <MapPinIcon className="size-4" />
-                            Country
-                          </span>
-                        </div>
-                        <select
-                          className="select select-bordered"
-                          value={country}
-                          onChange={(event) => setCountry(event.target.value)}
-                        >
-                          <option value="Do not specified">
-                            Don&apos;t specified
-                          </option>
-                          {allCountries.map((country, index) => (
-                            <option
-                              value={country[1].toLowerCase()}
-                              key={index}
-                            >
-                              {country[0]}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="form-control">
-                        <div className="label">
-                          <span className="label-text flex items-center gap-1">
-                            <PencilIcon className="size-4" />
-                            Signature
-                          </span>
-                        </div>
-                        <textarea
-                          className="textarea textarea-bordered h-24"
-                          placeholder="Type your signature here"
-                          value={signature}
-                          onChange={(event) => setSignature(event.target.value)}
-                          maxLength={maxSignatureLength}
-                        />
-                        <div className="label">
-                          <span className="label-text-alt" />
-                          <span className="label-text-alt">
-                            {maxSignatureLength - signature.length} /{" "}
-                            {maxSignatureLength}
-                          </span>
-                        </div>
-                      </label>
-                      {status.type && status.message && (
-                        <div
-                          role="alert"
-                          className={`alert alert-${status.type}`}
-                        >
-                          {status.type === "error" ? (
-                            <XCircleIcon className="size-6 shrink-0 stroke-current" />
-                          ) : (
-                            status.type === "warning" && (
-                              <ExclamationTriangleIcon className="size-6 shrink-0 stroke-current" />
-                            )
-                          )}
-                          <span>{status.message}</span>
-                        </div>
-                      )}
-                      <p>
-                        You can change visibility your information on{" "}
-                        <button className="link link-primary">privacy</button>{" "}
-                        settings.
-                      </p>
-                      <div className="modal-action justify-center">
-                        <button
-                          className="btn btn-primary"
-                          disable={loading}
-                          onClick={handleUpdateProfile}
-                        >
-                          {loading ? (
-                            <span className="loading loading-spinner" />
-                          ) : status.type === "success" ? (
-                            <CheckCircleIcon className="size-5" />
-                          ) : status.type === "error" ? (
-                            <XCircleIcon className="size-5" />
-                          ) : (
-                            status.type === "warning" && (
-                              <ExclamationTriangleIcon className="size-5" />
-                            )
-                          )}{" "}
-                          Update
-                        </button>
-                        <form method="dialog">
-                          <button className="btn btn-outline btn-primary">
-                            Cancel
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-                    <form method="dialog" className="modal-backdrop">
-                      <button>close</button>
-                    </form>
-                  </dialog>
-                </>
+                <Link href="/settings/profile" className="btn">
+                  Edit Profile
+                </Link>
               ) : (
                 <button
                   className="btn"
-                  onClick={() =>
-                    session
-                      ? null
-                      : document.getElementById("auth-sign-in").showModal()
-                  }
+                  onClick={() => !session && handleShowSignInModal}
                 >
                   Follow
                 </button>
@@ -662,22 +333,22 @@ function Component() {
           <div className="space-y-4 p-12">
             <div className="flex gap-2">
               <Link
-                href={`/users/${session?.user.id}/followers`}
-                className="badge badge-primary badge-lg gap-2 border-none pl-0"
-              >
-                <div className="badge badge-lg gap-2">
-                  <UserGroupIcon className="size-4" /> Followers
-                </div>
-                {followers.length || 0}
-              </Link>
-              <Link
-                href={`/users/${session?.user.id}/following`}
+                href={`/users/${user.id}/following`}
                 className="badge badge-primary badge-lg gap-2 border-none pl-0"
               >
                 <div className="badge badge-lg gap-2">
                   <UsersIcon className="size-4" /> Following
                 </div>
-                {following.length || 0}
+                {following?.length || 0}
+              </Link>
+              <Link
+                href={`/users/${user.id}/followers`}
+                className="badge badge-primary badge-lg gap-2 border-none pl-0"
+              >
+                <div className="badge badge-lg gap-2">
+                  <UserGroupIcon className="size-4" /> Followers
+                </div>
+                {followers?.length || 0}
               </Link>
             </div>
             <div className="grid auto-cols-max grid-flow-col gap-4">
@@ -719,10 +390,7 @@ function Component() {
                         <button
                           type="button"
                           role="tab"
-                          className={
-                            "tab space-x-2" +
-                            (active === index ? " tab-active" : "")
-                          }
+                          className={`tab space-x-2 ${active === index ? "tab-active" : ""}`}
                           onClick={() => setActive(index)}
                         >
                           <EyeSlashIcon className="size-5" />{" "}
@@ -733,9 +401,7 @@ function Component() {
                           <button
                             type="button"
                             role="tab"
-                            className={
-                              active === index ? "tab tab-active" : "tab"
-                            }
+                            className={`tab ${active === index ? "tab-active" : ""}`}
                             onClick={() => setActive(index)}
                           >
                             {tab.name}
@@ -844,6 +510,7 @@ export async function getServerSideProps(context) {
   const comments = await fetcher(
     `http://localhost:3000/api/v1/users/${context.query.id}/comments`,
   );
+
   return {
     props: {
       fallback: {
