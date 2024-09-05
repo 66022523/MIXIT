@@ -1,35 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { createClient } from "@/utils/supabase/component";
-
 export function CirclePlaceholder({ skeleton }) {
   return (
     <div className="card w-96 bg-base-200">
       <div className="card-body gap-4">
         <div
-          className={
-            "h-4 w-28" + (skeleton ? " skeleton" : " rounded-full bg-base-300")
-          }
+          className={`h-4 w-28 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
         />
         <div className="flex flex-col gap-4">
           <div
-            className={
-              "h-4 w-full" +
-              (skeleton ? " skeleton" : " rounded-full bg-base-300")
-            }
+            className={`h-4 w-full ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
           />
           <div
-            className={
-              "h-4 w-full" +
-              (skeleton ? " skeleton" : " rounded-full bg-base-300")
-            }
+            className={`h-4 w-full ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
           />
           <div
-            className={
-              "h-4 w-36" +
-              (skeleton ? " skeleton" : " rounded-full bg-base-300")
-            }
+            className={`h-4 w-36 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
           />
         </div>
       </div>
@@ -38,25 +25,12 @@ export function CirclePlaceholder({ skeleton }) {
 }
 
 export function CircleTall({ id, coverURL, iconURL, name, description }) {
-  const supabase = createClient();
-  const { data: cover } = supabase.storage
-    .from("circles")
-    .getPublicUrl(coverURL);
-  const { data: icon } = supabase.storage
-    .from("circles")
-    .getPublicUrl(iconURL, {
-      transform: {
-        width: 100,
-        height: 100,
-      },
-    });
-
   return (
     <Link
       href={`/circles/${id}`}
       className="hero overflow-clip rounded-2xl"
       style={{
-        backgroundImage: `url("${cover.publicUrl}")`,
+        backgroundImage: `url("${coverURL}")`,
       }}
     >
       <div className="hero-overlay bg-opacity-75" />
@@ -66,7 +40,7 @@ export function CircleTall({ id, coverURL, iconURL, name, description }) {
             <h2 className="flex items-center gap-2 font-bold">
               <Image
                 className="mask mask-circle size-5"
-                src={icon.publicUrl}
+                src={iconURL}
                 alt={name}
                 width={20}
                 height={20}
@@ -85,15 +59,10 @@ export function CircleTall({ id, coverURL, iconURL, name, description }) {
 }
 
 export function Circle({ id, coverURL, name, description }) {
-  const supabase = createClient();
-  const { data: cover } = supabase.storage.from("circles").getPublicUrl(coverURL);
-
   return (
     <Link href={`/circles/${id}`} className="card image-full w-96 bg-base-100">
       <figure>
-        <picture>
-          <img src={cover.publicUrl} alt={name} />
-        </picture>
+        <Image src={coverURL} alt={name} width={384} height={234} />
       </figure>
       <div className="card-body">
         <h3 className="card-title">{name}</h3>
