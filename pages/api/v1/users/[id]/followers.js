@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       try {
         const { data, error } = await supabase
           .from("followers")
-          .select("user:follower_id (*)")
+          .select("user:user_id (*)")
           .eq("follower_id", req.query.id);
 
         if (!data)
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
             error,
           });
 
-        return res.status(200).json(data);
+        return res.status(200).json(data.flatMap(({ user }) => user));
       } catch (error) {
         return res
           .status(500)
