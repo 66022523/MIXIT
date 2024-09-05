@@ -38,27 +38,6 @@
   }
 }
 
-/* DaisyUI */
-.modal {
-  @apply backdrop-blur;
-}
-
-/* NProgress */
-#nprogress .bar {
-  @apply rounded-full;
-  @apply bg-primary;
-  @apply z-[9999];
-  @apply h-[3px];
-}
-#nprogress .peg {
-  @apply rounded-full;
-  @apply shadow-[0_0_15px_oklch(var(--p)),_0_0_10px_oklch(var(--p))];
-}
-#nprogress .spinner-icon {
-  @apply border-t-primary;
-  @apply border-l-primary;
-}
-
 /* Hightlight.js */
 .hljs-attr {
   @apply text-primary;
