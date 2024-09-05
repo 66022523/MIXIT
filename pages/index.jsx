@@ -12,6 +12,22 @@ import { Post, PostPlaceholder } from "@/components/post";
 
 import { fetcher } from "@/utils/fetcher";
 
+export const getServerSideProps = async () => {
+  const circles = await fetcher("http://localhost:3000/api/v1/circles");
+  const posts = await fetcher("http://localhost:3000/api/v1/posts");
+  const tags = await fetcher("http://localhost:3000/api/v1/tags");
+
+  return {
+    props: {
+      fallback: {
+        "/api/v1/circles": circles,
+        "/api/v1/posts": posts,
+        "/api/v1/tags": tags,
+      },
+    },
+  };
+};
+
 function Component() {
   const { data: circles } = useSWR("/api/v1/circles");
   const { data: posts } = useSWR("/api/v1/posts");
@@ -127,20 +143,4 @@ export default function Home({ fallback }) {
       <Component />
     </SWRConfig>
   );
-}
-
-export async function getServerSideProps() {
-  const circles = await fetcher("http://localhost:3000/api/v1/circles");
-  const posts = await fetcher("http://localhost:3000/api/v1/posts");
-  const tags = await fetcher("http://localhost:3000/api/v1/tags");
-
-  return {
-    props: {
-      fallback: {
-        "/api/v1/circles": circles,
-        "/api/v1/posts": posts,
-        "/api/v1/tags": tags,
-      },
-    },
-  };
 }

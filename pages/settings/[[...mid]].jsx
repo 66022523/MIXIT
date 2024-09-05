@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -22,11 +22,27 @@ import { CountryDropdown } from "react-country-region-selector";
 
 import { Section, NotFound, Copyright } from "@/components/content";
 
-import { SessionContext } from "@/contexts/session";
+import { useSession } from "@/contexts/session";
 
 import { createClient as createServerClient } from "@/utils/supabase/server-props";
 import { createClient } from "@/utils/supabase/component";
 import { fetcher } from "@/utils/fetcher";
+
+export const getServerSideProps = async (context) => {
+  const supabase = createServerClient(context);
+  const { data, error } = await supabase.auth.getUser();
+  const user = await fetcher(
+    `http://localhost:3000/api/v1/users/${data.user?.id}`,
+  );
+
+  return {
+    props: {
+      fallback: {
+        [`/api/v1/users/${data.user?.id}`]: user,
+      },
+    },
+  };
+};
 
 export function AccountSettings() {
   return <>test 4</>;
@@ -42,7 +58,7 @@ export function SecuritySettings() {
 
 export function ProfileSettings() {
   const supabase = createClient();
-  const session = useContext(SessionContext);
+  const session = useSession();
 
   const { data: user } = useSWR(
     session && `/api/v1/users/${session?.user.id}`,
@@ -328,11 +344,9 @@ export function ProfileSettings() {
 
 export function Component() {
   const router = useRouter();
-  const session = useContext(SessionContext);
+  const session = useSession();
 
-  const MIDQuery = router.query.mid ?? [
-    session ? "profile" : "privacy",
-  ];
+  const MIDQuery = router.query.mid ?? [session ? "profile" : "privacy"];
   const menus = [
     {
       id: "profile",
@@ -412,20 +426,4 @@ export default function Settings({ fallback }) {
       <Component />
     </SWRConfig>
   );
-}
-
-export async function getServerSideProps(context) {
-  const supabase = createServerClient(context);
-  const { data, error } = await supabase.auth.getUser();
-  const user = await fetcher(
-    `http://localhost:3000/api/v1/users/${data.user?.id}`,
-  );
-
-  return {
-    props: {
-      fallback: {
-        [`/api/v1/users/${data.user?.id}`]: user,
-      },
-    },
-  };
 }

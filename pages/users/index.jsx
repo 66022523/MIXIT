@@ -7,6 +7,22 @@ import { User } from "@/components/user";
 
 import { fetcher } from "@/utils/fetcher";
 
+const getServerSideProps = async () => {
+  const users = await fetcher("http://localhost:3000/api/v1/users");
+  const circles = await fetcher("http://localhost:3000/api/v1/circles");
+  const tags = await fetcher("http://localhost:3000/api/v1/tags");
+
+  return {
+    props: {
+      fallback: {
+        "/api/v1/users": users,
+        "/api/v1/circles": circles,
+        "/api/v1/tags": tags,
+      },
+    },
+  };
+};
+
 function Component() {
   const { data: users } = useSWR("/api/v1/users");
 
@@ -80,19 +96,4 @@ export default function Users({ fallback }) {
       <Component />
     </SWRConfig>
   );
-}
-
-export async function getServerSideProps() {
-  const users = await fetcher("http://localhost:3000/api/v1/users");
-  const circles = await fetcher("http://localhost:3000/api/v1/circles");
-  const tags = await fetcher("http://localhost:3000/api/v1/tags");
-  return {
-    props: {
-      fallback: {
-        "/api/v1/users": users,
-        "/api/v1/circles": circles,
-        "/api/v1/tags": tags,
-      },
-    },
-  };
 }

@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState, useContext, Fragment } from "react";
+import { useState, Fragment } from "react";
 import useSWR, { SWRConfig } from "swr";
 import { EyeSlashIcon, FunnelIcon } from "@heroicons/react/24/outline";
 import { UsersIcon, UserGroupIcon } from "@heroicons/react/24/solid";
@@ -12,9 +12,49 @@ import { NotFound, Empty } from "@/components/content";
 import { CommentTall } from "@/components/comments";
 import { PostTall } from "@/components/post";
 
-import { SessionContext } from "@/contexts/session";
+import { useSession } from "@/contexts/session";
 
 import { fetcher } from "@/utils/fetcher";
+
+export const getServerSideProps = async ({ params }) => {
+  const user = await fetcher(`http://localhost:3000/api/v1/users/${params.id}`);
+  const followers = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/followers`,
+  );
+  const following = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/following`,
+  );
+  const circles = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/circles`,
+  );
+  const posts = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/posts`,
+  );
+  const views = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/views`,
+  );
+  const likes = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/likes`,
+  );
+  const comments = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/comments`,
+  );
+
+  return {
+    props: {
+      fallback: {
+        [`/api/v1/users/${params.id}`]: user,
+        [`/api/v1/users/${params.id}/followers`]: followers,
+        [`/api/v1/users/${params.id}/following`]: following,
+        [`/api/v1/users/${params.id}/circles`]: circles,
+        [`/api/v1/users/${params.id}/posts`]: posts,
+        [`/api/v1/users/${params.id}/views`]: views,
+        [`/api/v1/users/${params.id}/likes`]: likes,
+        [`/api/v1/users/${params.id}/comments`]: comments,
+      },
+    },
+  };
+};
 
 function UserTabCircles() {
   const router = useRouter();
@@ -170,7 +210,7 @@ function UserTabReports() {
 
 function Component() {
   const router = useRouter();
-  const session = useContext(SessionContext);
+  const session = useSession();
 
   const { data: user } = useSWR(`/api/v1/users/${router.query.id}`);
   const { data: followers } = useSWR(
@@ -254,14 +294,14 @@ function Component() {
         </div>
       ) : (
         <div className="container relative mx-auto min-h-screen">
-            <div
-              className="hero h-80 overflow-clip rounded-2xl bg-base-300 bg-fixed bg-cover text-base-100"
-              style={{
-                backgroundImage: `url(${user.cover_url || "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM0 72h40v4H0v-4zm0-8h31v4H0v-4zm20-16h20v4H20v-4zM0 56h40v4H0v-4zm63-25a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM53 41a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-30 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-28-8a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zM56 5a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zm-3 46a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 0l5 20H16l5-20zm43 64v-4h-4v4h-4v4h4v4h4v-4h4v-4h-4zM36 13h4v4h-4v-4zm4 4h4v4h-4v-4zm-4 4h4v4h-4v-4zm8-8h4v4h-4v-4z'/%3E%3C/g%3E%3C/svg%3E\""})`,
-              }}
-            >
-              <div className="hero-overlay bg-opacity-0 bg-gradient-to-b from-transparent to-base-300" />
-            </div>
+          <div
+            className="hero h-80 overflow-clip rounded-2xl bg-base-300 bg-cover bg-fixed text-base-100"
+            style={{
+              backgroundImage: `url(${user.cover_url || "\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM0 72h40v4H0v-4zm0-8h31v4H0v-4zm20-16h20v4H20v-4zM0 56h40v4H0v-4zm63-25a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM53 41a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-30 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-28-8a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zM56 5a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zm-3 46a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 0l5 20H16l5-20zm43 64v-4h-4v4h-4v4h4v4h4v-4h4v-4h-4zM36 13h4v4h-4v-4zm4 4h4v4h-4v-4zm-4 4h4v4h-4v-4zm8-8h4v4h-4v-4z'/%3E%3C/g%3E%3C/svg%3E\""})`,
+            }}
+          >
+            <div className="hero-overlay bg-opacity-0 bg-gradient-to-b from-transparent to-base-300" />
+          </div>
           <div className="absolute top-64 grid w-full grid-cols-2 justify-between px-12">
             <div className="flex gap-4">
               <div className={`avatar ${user.avatar_url ? "" : "placeholder"}`}>
@@ -479,50 +519,8 @@ function Component() {
 
 export default function User({ fallback }) {
   return (
-    <SWRConfig value={{ fallback }}>
+    <SWRConfig value={{ fallback, fetcher }}>
       <Component />
     </SWRConfig>
   );
-}
-
-export async function getServerSideProps(context) {
-  const user = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}`,
-  );
-  const followers = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/followers`,
-  );
-  const following = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/following`,
-  );
-  const circles = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/circles`,
-  );
-  const posts = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/posts`,
-  );
-  const views = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/views`,
-  );
-  const likes = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/likes`,
-  );
-  const comments = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/comments`,
-  );
-
-  return {
-    props: {
-      fallback: {
-        [`/api/v1/users/${context.query.id}`]: user,
-        [`/api/v1/users/${context.query.id}/followers`]: followers,
-        [`/api/v1/users/${context.query.id}/following`]: following,
-        [`/api/v1/users/${context.query.id}/circles`]: circles,
-        [`/api/v1/users/${context.query.id}/posts`]: posts,
-        [`/api/v1/users/${context.query.id}/views`]: views,
-        [`/api/v1/users/${context.query.id}/likes`]: likes,
-        [`/api/v1/users/${context.query.id}/comments`]: comments,
-      },
-    },
-  };
 }

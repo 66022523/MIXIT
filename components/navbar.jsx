@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TagIcon,
   FunnelIcon,
@@ -27,7 +27,7 @@ import {
 
 import { Favicon } from "./content";
 
-import { SessionContext } from "@/contexts/session";
+import { useSession } from "@/contexts/session";
 
 import useUser from "@/hooks/useUser";
 
@@ -36,7 +36,7 @@ import { createClient } from "@/utils/supabase/component";
 export function TopNavbar() {
   const supabase = createClient();
   const router = useRouter();
-  const session = useContext(SessionContext);
+  const session = useSession();
 
   const { data: user, error, isLoading } = useUser(session?.user.id);
 
@@ -334,7 +334,7 @@ export function TopNavbar() {
 
 export function BottomNavbar() {
   const router = useRouter();
-  const session = useContext(SessionContext);
+  const session = useSession();
 
   const handleShowSignInModal = () => {
     document.getElementById("auth-sign-in").showModal();

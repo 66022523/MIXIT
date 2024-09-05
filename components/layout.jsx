@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
@@ -13,7 +12,7 @@ import {
 import { Favicon } from "./content";
 import { TopNavbar, BottomNavbar } from "./navbar";
 
-import { SessionContext } from "@/contexts/session";
+import { useSession } from "@/contexts/session";
 
 import useUser from "@/hooks/useUser";
 
@@ -40,13 +39,13 @@ const DynamicAuthForgotModal = dynamic(
 );
 
 export default function Layout(props) {
-  const session = useContext(SessionContext);
+  const session = useSession();
   const pathname = usePathname();
   const {
     data: circles,
     error,
     isLoading,
-  } = useUser(session && `${session?.user.id}/circles`);
+  } = useUser(session && `${session.user.id}/circles`);
 
   const flattenLayoutPaths = ["/recovery"];
 

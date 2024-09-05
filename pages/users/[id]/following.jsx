@@ -8,6 +8,27 @@ import { User } from "@/components/user";
 
 import { fetcher } from "@/utils/fetcher";
 
+export const getServerSideProps = async ({ params }) => {
+  const user = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}`,
+  );
+  const following = await fetcher(
+    `http://localhost:3000/api/v1/users/${params.id}/following`,
+  );
+  const circles = await fetcher("http://localhost:3000/api/v1/circles");
+  const tags = await fetcher("http://localhost:3000/api/v1/tags");
+  return {
+    props: {
+      fallback: {
+        [`/api/v1/users/${params.id}`]: user,
+        [`/api/v1/users/${params.id}/following`]: following,
+        "/api/v1/circles": circles,
+        "/api/v1/tags": tags,
+      },
+    },
+  };
+}
+
 function Component() {
   const router = useRouter();
   const { data: user } = useSWR(`/api/v1/users/${router.query.id}`);
@@ -89,25 +110,4 @@ export default function Following({ fallback }) {
       <Component />
     </SWRConfig>
   );
-}
-
-export async function getServerSideProps(context) {
-  const user = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}`,
-  );
-  const following = await fetcher(
-    `http://localhost:3000/api/v1/users/${context.query.id}/following`,
-  );
-  const circles = await fetcher("http://localhost:3000/api/v1/circles");
-  const tags = await fetcher("http://localhost:3000/api/v1/tags");
-  return {
-    props: {
-      fallback: {
-        [`/api/v1/users/${context.query.id}`]: user,
-        [`/api/v1/users/${context.query.id}/following`]: following,
-        "/api/v1/circles": circles,
-        "/api/v1/tags": tags,
-      },
-    },
-  };
 }

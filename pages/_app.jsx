@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter, Kanit } from "next/font/google";
@@ -12,9 +12,7 @@ import "@/styles/globals.css";
 
 import Layout from "@/components/layout";
 
-import { SessionContext } from "@/contexts/session";
-
-import { createClient } from "@/utils/supabase/component";
+import { SessionProvider } from "@/contexts/session";
 
 const inter = Inter({
   subsets: [
@@ -38,28 +36,13 @@ const kanit = Kanit({
 });
 
 export default function App({ Component, pageProps }) {
-  const supabase = createClient();
   const router = useRouter();
   const progressRef = useRef(null);
-  const [session, setSession] = useState(null);
 
   useEffect(() => {
     hljs.registerLanguage("json", json);
     hljs.highlightAll();
   }, []);
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        setSession(null);
-      } else if (session) {
-        setSession(session);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
   useEffect(() => {
     const startProgress = () => {
       const step = () => {
@@ -99,7 +82,7 @@ export default function App({ Component, pageProps }) {
   }, [router]);
 
   return (
-    <SessionContext.Provider value={session}>
+    <SessionProvider>
       <Head>
         <title>MIXIT&apos;s - Popular Gaming Community</title>
         <meta
@@ -119,6 +102,6 @@ export default function App({ Component, pageProps }) {
       </Layout>
       <Analytics />
       <SpeedInsights />
-    </SessionContext.Provider>
+    </SessionProvider>
   );
 }
