@@ -7,9 +7,8 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { Circle, CirclePlaceholder } from "@/components/circle";
-import { EmptyPlaceholder } from "@/components/error";
+import { Section, EmptyPlaceholder, Content } from "@/components/content";
 import { Post, PostPlaceholder } from "@/components/post";
-import Sidebar from "@/components/sidebar";
 
 import { fetcher } from "@/utils/fetcher";
 
@@ -35,92 +34,89 @@ function Component() {
           </span>
         </div>
       </div>
-      <div className="grid min-h-screen grid-cols-4 gap-12 lg:flex-nowrap">
-        <div className="order-last col-span-4 space-y-4 lg:order-first lg:col-span-3 lg:space-y-12">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-2">
-              <UserGroupIcon className="size-8 rounded-full bg-primary p-2 text-primary-content" />
-              <h2 className="font-bold">Communities</h2>
-              <small className="hidden space-x-1 text-gray-500 lg:block">
+      <Content>
+        <div className="flex justify-between">
+          <Section
+            Icon={UserGroupIcon}
+            inline
+            title="Communities"
+            hint={
+              <>
                 (<kbd className="kbd kbd-xs">Shift</kbd>
                 <span>+</span>
                 <kbd className="kbd kbd-xs">Scroll</kbd>)
-              </small>
-            </div>
-            <Link href="/circles" className="btn btn-ghost btn-sm">
-              View All
-              <ChevronRightIcon className="size-5 rounded-full bg-primary p-1 text-primary-content" />
-            </Link>
+              </>
+            }
+            hintClass="hidden space-x-1 text-gray-500 lg:block"
+          />
+          <Link href="/circles" className="btn btn-ghost btn-sm">
+            View All
+            <ChevronRightIcon className="size-5 rounded-full bg-primary p-1 text-primary-content" />
+          </Link>
+        </div>
+        {circles?.length ? (
+          <div className="carousel carousel-center relative w-full space-x-4 rounded-box bg-base-100 p-4 hover:overflow-x-scroll">
+            {circles.map((circle, index) => (
+              <div className="carousel-item" key={index}>
+                <Circle
+                  id={circle.id}
+                  coverURL={circle.cover_url}
+                  name={circle.name}
+                  description={circle.description}
+                />
+              </div>
+            ))}
           </div>
-          {circles?.length ? (
-            <div className="carousel carousel-center relative w-full space-x-4 rounded-box bg-base-100 p-4 hover:overflow-x-scroll">
-              {circles.map((circle, index) => (
+        ) : (
+          <EmptyPlaceholder
+            title="Empty Circles"
+            description="There are currently no circles."
+          >
+            <div className="carousel carousel-center relative w-full space-x-4 p-4 hover:overflow-x-scroll">
+              {Array.from({ length: 2 }).map((_, index) => (
                 <div className="carousel-item" key={index}>
-                  <Circle
-                    id={circle.id}
-                    coverURL={circle.cover_url}
-                    name={circle.name}
-                    description={circle.description}
-                  />
+                  <CirclePlaceholder />
                 </div>
               ))}
             </div>
-          ) : (
-            <EmptyPlaceholder
-              title="Empty Circles"
-              description="There are currently no circles."
-            >
-              <div className="carousel carousel-center relative w-full space-x-4 p-4 hover:overflow-x-scroll">
-                {Array.from({ length: 2 }).map((_, index) => (
-                  <div className="carousel-item" key={index}>
-                    <CirclePlaceholder />
-                  </div>
-                ))}
-              </div>
-            </EmptyPlaceholder>
-          )}
-          <div className="items-content flex gap-2">
-            <Bars3BottomLeftIcon className="size-8 rounded-full bg-primary p-2 text-primary-content" />
-            <h2 className="font-bold">Posts</h2>
+          </EmptyPlaceholder>
+        )}
+        <Section Icon={Bars3BottomLeftIcon} title="Posts" />
+        {posts?.length ? (
+          <div className="rounded-2xl bg-base-100">
+            {posts.map((post, index) => (
+              <Post
+                id={post.id}
+                createdAt={post.created_at}
+                title={post.title}
+                content={post.content}
+                tags={post.tags}
+                images={post.images}
+                view={post.views}
+                likes={post.likes}
+                comments={post.comments}
+                shares={post.shares}
+                writerID={post.writer?.id}
+                writerAvatarURL={post.writer?.avatar_url}
+                writerNickname={post.writer?.nickname}
+                writerRole={post.writer?.role}
+                circleID={post.circle?.id}
+                circleIconURL={post.circle?.icon_url}
+                circleName={post.circle?.name}
+                isEnded={index + 1 === posts.length}
+                key={index}
+              />
+            ))}
           </div>
-          {posts?.length ? (
-            <div className="rounded-2xl bg-base-100">
-              {posts.map((post, index) => (
-                <Post
-                  id={post.id}
-                  createdAt={post.created_at}
-                  title={post.title}
-                  content={post.content}
-                  tags={post.tags}
-                  images={post.images}
-                  view={post.views}
-                  likes={post.likes}
-                  comments={post.comments}
-                  shares={post.shares}
-                  writerID={post.writer.id}
-                  writerAvatarURL={post.writer.avatar_url}
-                  writerNickname={post.writer.nickname}
-                  circleID={post.circle.id}
-                  circleIconURL={post.circle.icon_url}
-                  circleName={post.circle.name}
-                  isEnded={index + 1 === posts.length}
-                  key={index}
-                />
-              ))}
-            </div>
-          ) : (
-            <EmptyPlaceholder
-              title="Empty Posts"
-              description="There are currently no posts."
-            >
-              <PostPlaceholder isEnded={true} />
-            </EmptyPlaceholder>
-          )}
-        </div>
-        <div className="order-first col-span-4 hidden space-y-4 lg:order-last lg:col-span-1 lg:block lg:space-y-12">
-          <Sidebar />
-        </div>
-      </div>
+        ) : (
+          <EmptyPlaceholder
+            title="Empty Posts"
+            description="There are currently no posts."
+          >
+            <PostPlaceholder isEnded={true} />
+          </EmptyPlaceholder>
+        )}
+      </Content>
     </div>
   );
 }
