@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
   ChatBubbleBottomCenterIcon,
   EllipsisVerticalIcon,
@@ -10,6 +11,14 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { TagPill, TagPillPlaceholder } from "./tag";
+
+const DynamicViewerImages = dynamic(
+  () => import("./modals/viewer").then((viewer) => viewer.Images),
+  {
+    suspense: true,
+    loading: () => <span className="loading loading-ball" />,
+  },
+);
 
 export function PostTall({
   id,
@@ -60,6 +69,7 @@ export function Post({
   writerID,
   writerAvatarURL,
   writerNickname,
+  writerRole,
   circleID,
   circleIconURL,
   circleName,
@@ -78,9 +88,11 @@ export function Post({
       seconds: 1,
     };
     const secondsElapsed = (date.getTime() - Date.now()) / 1000;
+
     for (let key in ranges) {
       if (ranges[key] < Math.abs(secondsElapsed)) {
         const delta = secondsElapsed / ranges[key];
+
         return formatter.format(Math.round(delta), key);
       }
     }
@@ -95,20 +107,9 @@ export function Post({
               href={`/users/${writerID}`}
               className="flex items-center gap-2"
             >
-              <div
-                className={
-                  writerAvatarURL
-                    ? writerAvatarURL
-                      ? "avatar"
-                      : "avatar placeholder"
-                    : "avatar"
-                }
-              >
+              <div className={`avatar ${writerAvatarURL ? "" : "placeholder"}`}>
                 <div
-                  className={
-                    "h-12 w-12 rounded-full" +
-                    (writerAvatarURL ? "" : " bg-neutral text-neutral-content")
-                  }
+                  className={`size-12 rounded-full ${writerAvatarURL ? "" : "bg-neutral text-neutral-content"}`}
                 >
                   {writerAvatarURL ? (
                     <Image
@@ -123,8 +124,18 @@ export function Post({
                 </div>
               </div>
               <div>
-                <h4>{writerNickname}</h4>
-                <small>{timeSince(createdAt)}</small>
+                <h4
+                  className={`font-bold ${writerRole.toLowerCase() === "admin" ? "text-secondary" : ""}`}
+                >
+                  {writerNickname}
+                </h4>
+                <time
+                  className="text-sm"
+                  dateTime={new Date(createdAt).toISOString()}
+                  suppressHydrationWarning
+                >
+                  {timeSince(createdAt)}
+                </time>
               </div>
             </Link>
             <div className="flex items-center gap-2">
@@ -158,33 +169,87 @@ export function Post({
               <h3 className="card-title">{title}</h3>
               <p>{content}</p>
             </Link>
-            <div className="flex flex-wrap gap-2">
-              <TagPill
-                isHeader={true}
-                iconURL={circleIconURL}
-                name={circleName}
-                url={`/circles/${circleID}`}
-              />
-              {tags?.map((tag, index) => (
-                <TagPill name={tag.name} url={`/tags/${tag.id}`} key={index} />
-              ))}
-            </div>
-            <div className="grid grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-2 lg:grid-rows-2">
-              {images?.map((image, index) => (
-                <picture
-                  className={index >= 1 ? "hidden lg:block" : ""}
-                  key={index}
-                >
-                  <img
-                    className="rounded-2xl"
-                    src={image.source}
-                    alt={image.alternate}
-                    width="100%"
-                    height="100%"
+            {(circleID || tags) && (
+              <div className="flex flex-wrap gap-2">
+                {circleID && (
+                  <TagPill
+                    isHeader={true}
+                    iconURL={circleIconURL}
+                    name={circleName}
+                    url={`/circles/${circleID}`}
                   />
-                </picture>
-              ))}
-            </div>
+                )}
+                {tags?.map((tag, index) => (
+                  <TagPill
+                    name={tag.name}
+                    url={`/tags/${tag.id}`}
+                    key={index}
+                  />
+                ))}
+              </div>
+            )}
+            {images && (
+              <div className="grid grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-2 lg:grid-rows-2">
+                {images.map(
+                  (image, index) =>
+                    index < 4 && (
+                      <a
+                        href={`#post-${id}-image-${index + 1}`}
+                        onClick={() =>
+                          document
+                            .getElementById(`viewer-post-${id}-images`)
+                            .showModal()
+                        }
+                        key={index}
+                      >
+                        <Image
+                          className={`w-full rounded-box ${index >= 1 ? "hidden lg:block" : ""}`}
+                          src={image.source}
+                          alt={image.alternate}
+                          width={1280}
+                          height={720}
+                        />
+                      </a>
+                    ),
+                )}
+                <DynamicViewerImages
+                  id={`post-${id}`}
+                  items={images.map((image, index) => (
+                    <div
+                      id={`post-${id}-image-${index + 1}`}
+                      className="carousel-item w-full items-center justify-center"
+                      key={index}
+                    >
+                      <picture className="relative py-10">
+                        <img
+                          className="absolute w-full rounded-2xl blur-lg"
+                          src={image.source}
+                          alt={image.alternate}
+                          width="100%"
+                          height="100%"
+                        />
+                        <img
+                          className="relative w-full rounded-2xl"
+                          src={image.source}
+                          alt={image.alternate}
+                          width="100%"
+                          height="100%"
+                        />
+                      </picture>
+                    </div>
+                  ))}
+                  indicators={images.map((_, index) => (
+                    <a
+                      href={`#post-${id}-image-${index + 1}`}
+                      className="btn btn-xs"
+                      key={index}
+                    >
+                      {index + 1}
+                    </a>
+                  ))}
+                />
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-4 gap-2">
             <div className="flex items-center justify-center gap-2 text-sm text-base-content">
@@ -194,7 +259,7 @@ export function Post({
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(views?.length ?? 0)}
+              }).format(views?.length || 0)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
               <button className="btn btn-circle btn-error btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-error-content">
@@ -203,7 +268,7 @@ export function Post({
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(likes?.length ?? 0)}
+              }).format(likes?.length || 0)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
               <button className="btn btn-circle btn-primary btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-primary-content">
@@ -212,7 +277,7 @@ export function Post({
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(comments?.length ?? 0)}
+              }).format(comments?.length || 0)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
               <button className="btn btn-circle btn-primary btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-primary-content">
@@ -221,7 +286,7 @@ export function Post({
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(shares?.length ?? 0)}
+              }).format(shares?.length || 0)}
             </div>
           </div>
         </div>
@@ -238,51 +303,30 @@ export function PostPlaceholder({ skeleton, isEnded }) {
         <div className="card-body space-y-4">
           <div className="flex items-center gap-4">
             <div
-              className={
-                "size-16 shrink-0 rounded-full" +
-                (skeleton ? " skeleton" : " bg-base-300")
-              }
+              className={`size-16 shrink-0 rounded-full ${skeleton ? "skeleton" : "bg-base-300"}`}
             />
             <div className="flex flex-col gap-2">
               <div
-                className={
-                  "h-4 w-20" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-20 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
               <div
-                className={
-                  "h-4 w-28" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-28 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
             </div>
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
               <div
-                className={
-                  "h-4 w-20" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-20 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
               <div
-                className={
-                  "h-4 w-40" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-40 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
               <div
-                className={
-                  "h-4 w-48" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-48 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
               <div
-                className={
-                  "h-4 w-48" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`h-4 w-48 ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -293,10 +337,7 @@ export function PostPlaceholder({ skeleton, isEnded }) {
             <div className="grid grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-2 lg:grid-rows-2">
               {Array.from({ length: 4 }).map((_, index) => (
                 <div
-                  className={
-                    "h-32 w-full" +
-                    (skeleton ? " skeleton" : " rounded-box bg-base-300")
-                  }
+                  className={`h-32 w-full ${skeleton ? "skeleton" : "rounded-box bg-base-300"}`}
                   key={index}
                 />
               ))}
@@ -305,10 +346,7 @@ export function PostPlaceholder({ skeleton, isEnded }) {
           <div className="grid grid-cols-4 gap-2">
             {Array.from({ length: 4 }).map((_, index) => (
               <div
-                className={
-                  "mx-auto size-12 rounded-full" +
-                  (skeleton ? " skeleton" : " rounded-full bg-base-300")
-                }
+                className={`mx-auto size-12 rounded-full ${skeleton ? "skeleton" : "rounded-full bg-base-300"}`}
                 key={index}
               />
             ))}
