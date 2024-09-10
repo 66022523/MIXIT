@@ -1,22 +1,22 @@
 "use client";
 import { useState, useEffect, createContext, useContext } from "react";
 
-import { getUser as getAuthUser } from "@/lib/queries/auth";
 import { getProfile } from "@/lib/queries/users";
 
 const ProfileContext = createContext();
 
-export function ProfileProvider({ children }) {
+export function ProfileProvider({ id, children }) {
   const [profile, setProfile] = useState();
 
   useEffect(() => {
     const getProfileData = async () => {
-      const { user } = await getAuthUser();
-      const profile = await getProfile(user.id);
-      setProfile(profile);
+      if (id) {
+        const profile = await getProfile(id);
+        setProfile(profile);
+      }
     };
     getProfileData();
-  }, []);
+  }, [id]);
 
   return (
     <ProfileContext.Provider value={profile}>
