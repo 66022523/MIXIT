@@ -1,5 +1,6 @@
-"use client"
-import { useState, Fragment } from "react";
+"use client";
+import { useState, useCallback, Fragment } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { EyeSlashIcon, FunnelIcon } from "@heroicons/react/24/outline";
 
 import { UserTabCircles } from "./circles";
@@ -10,9 +11,14 @@ import { UserTabReports } from "./reports";
 import { UserTabViews } from "./views";
 
 export function UserTabs({ user, profile }) {
-  const [active, setActive] = useState(0);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
 
-  const tabs = [
+  const [active, setActive] = useState(tab ?? "circles");
+
+  const tabOptions = [
     {
       name: "Circles",
       value: "circles",
@@ -51,30 +57,46 @@ export function UserTabs({ user, profile }) {
     },
   ];
 
+  const createQueryString = useCallback(
+    (name, value) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+  const handleActiveTab = (tab) => {
+    router.push(`${pathname}?${createQueryString("tab", tab)}`, {
+      scroll: false,
+    });
+    setActive(tab);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div role="tablist" className="tabs-boxed tabs">
-          {tabs.map((tab, index) => (
+          {tabOptions.map((option, index) => (
             <Fragment key={index}>
-              {tab.private && user?.id === profile.id ? (
+              {option.private && user?.id === profile.id ? (
                 <button
                   type="button"
                   role="tab"
-                  className={`tab space-x-2 ${active === index ? "tab-active" : ""}`}
-                  onClick={() => setActive(index)}
+                  className={`tab space-x-2 ${active === option.value ? "tab-active" : ""}`}
+                  onClick={() => handleActiveTab(option.value)}
                 >
-                  <EyeSlashIcon className="size-5" /> <span>{tab.name}</span>
+                  <EyeSlashIcon className="size-5" /> <span>{option.name}</span>
                 </button>
               ) : (
-                !tab.private && (
+                !option.private && (
                   <button
                     type="button"
                     role="tab"
-                    className={`tab ${active === index ? "tab-active" : ""}`}
-                    onClick={() => setActive(index)}
+                    className={`tab ${active === option.value ? "tab-active" : ""}`}
+                    onClick={() => handleActiveTab(option.value)}
                   >
-                    {tab.name}
+                    {option.name}
                   </button>
                 )
               )}
@@ -82,23 +104,14 @@ export function UserTabs({ user, profile }) {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          {tabs[active].private && user?.id === profile.id ? (
-            <div className="badge badge-lg gap-2 border-none pl-0">
-              <div className="badge badge-primary badge-lg gap-2">
-                {profile[tabs[active].value]?.length || 0}
-              </div>
-              {tabs[active].name}
+          <div className="badge badge-lg gap-2 border-none pl-0">
+            <div className="badge badge-primary badge-lg gap-2">
+              {profile[
+                tabOptions.find((option) => option.value === active).value
+              ]?.length || 0}
             </div>
-          ) : (
-            !tabs[active].private && (
-              <div className="badge badge-lg gap-2 border-none pl-0">
-                <div className="badge badge-primary badge-lg gap-2">
-                  {profile[tabs[active].value]?.length || 0}
-                </div>
-                {tabs[active].name}
-              </div>
-            )
-          )}
+            {tabOptions.find((option) => option.value === active).name}
+          </div>
           <div className="dropdown dropdown-end">
             <div tabIndex={0} role="button" className="btn btn-circle btn-sm">
               <FunnelIcon className="size-5" />
@@ -118,11 +131,11 @@ export function UserTabs({ user, profile }) {
         </div>
       </div>
       <div>
-        {tabs.map((tab, index) => (
+        {tabOptions.map((option, index) => (
           <Fragment key={index}>
             <input
               type="radio"
-              className={active === index ? "tab-active" : ""}
+              className={active === option.value ? "tab-active" : ""}
               name="user-content-tabs"
               hidden
             />
@@ -130,7 +143,7 @@ export function UserTabs({ user, profile }) {
               role="tabpanel"
               className="tab-content space-y-6 !rounded-box border-base-300 bg-base-100 p-6"
             >
-              <tab.content profile={profile} />
+              <option.content profile={profile} />
             </div>
           </Fragment>
         ))}
