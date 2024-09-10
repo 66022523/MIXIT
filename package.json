@@ -1,7 +1,7 @@
 {
   "name": "mixit",
   "type": "module",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
-    "@lottiefiles/react-lottie-player": "^3.5.4",
+    "@lottiefiles/dotlottie-react": "^0.8.12",
     "@supabase/ssr": "^0.4.1",
     "@supabase/supabase-js": "^2.45.3",
     "@tiptap/pm": "^2.6.6",
@@ -22,12 +22,12 @@
     "flag-icons": "^7.2.3",
     "highlight.js": "^11.10.0",
     "js-beautify": "^1.15.1",
-    "next": "^14.2.8",
+    "next": "^14.2.9",
+    "next-nprogress-bar": "^2.3.13",
     "react": "^18.3.1",
     "react-country-region-selector": "^3.6.1",
     "react-dom": "^18.3.1",
-    "sharp": "^0.33.5",
-    "swr": "^2.2.5"
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
@@ -37,7 +37,7 @@
     "postcss": "^8.4.45",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "supabase": "^1.191.3",
+    "supabase": "^1.192.5",
     "tailwindcss": "^3.4.10"
   }
 }

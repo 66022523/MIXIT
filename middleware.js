@@ -15,7 +15,7 @@ export async function middleware(request) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
           response = NextResponse.next({
@@ -33,23 +33,28 @@ export async function middleware(request) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (user && request.nextUrl.pathname === "/settings")
+    return NextResponse.redirect(new URL("/settings/profile", request.url));
   if (
     !user &&
-    (request.nextUrl.pathname.startsWith("/settings/profile") ||
+    (request.nextUrl.pathname === "/settings" ||
+      request.nextUrl.pathname.startsWith("/settings/profile") ||
       request.nextUrl.pathname.startsWith("/settings/security") ||
       request.nextUrl.pathname.startsWith("/settings/account"))
-  ) {
-    return NextResponse.redirect(new URL("/settings", request.url));
-  }
-
-  supabase.auth.onAuthStateChange((event, _session) => {
-    if (
-      event !== "PASSWORD_RECOVERY" &&
-      request.nextUrl.pathname.startsWith("/recovery")
-    ) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  });
+  )
+    return NextResponse.redirect(new URL("/settings/privacy", request.url));
+  if (
+    user &&
+    (request.nextUrl.pathname.startsWith("/sign-in") ||
+      request.nextUrl.pathname.startsWith("/sign-up") ||
+      request.nextUrl.pathname.startsWith("/forgot"))
+  )
+    return NextResponse.redirect(new URL("/", request.url));
+  if (
+    !user?.app_metadata?.recovery_password &&
+    request.nextUrl.pathname.startsWith("/recovery")
+  )
+    return NextResponse.redirect(new URL("/", request.url));
 
   return response;
 }

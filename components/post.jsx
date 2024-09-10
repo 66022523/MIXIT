@@ -1,6 +1,7 @@
+"use client"
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import {
   ChatBubbleBottomCenterIcon,
   EllipsisVerticalIcon,
@@ -12,13 +13,7 @@ import {
 
 import { TagPill, TagPillPlaceholder } from "./tag";
 
-const DynamicViewerImages = dynamic(
-  () => import("./modals/viewer").then((viewer) => viewer.Images),
-  {
-    suspense: true,
-    loading: () => <span className="loading loading-ball" />,
-  },
-);
+import { ImagesViewer } from "./modals/viewer";
 
 export function PostTall({
   id,
@@ -75,6 +70,8 @@ export function Post({
   circleName,
   isEnded,
 }) {
+  const ref = useRef();
+
   const timeSince = (input) => {
     const date = input instanceof Date ? input : new Date(input);
     const formatter = new Intl.RelativeTimeFormat("en");
@@ -98,6 +95,10 @@ export function Post({
     }
   };
 
+  const handleShowImagesViewer = () => {
+    if (ref.current) ref.current.showModal();
+  };
+
   return (
     <>
       <div className="card">
@@ -119,13 +120,13 @@ export function Post({
                       height={48}
                     />
                   ) : (
-                    <span>{writerNickname.charAt(0)}</span>
+                    <span>{writerNickname?.charAt(0)}</span>
                   )}
                 </div>
               </div>
               <div>
                 <h4
-                  className={`font-bold ${writerRole.toLowerCase() === "admin" ? "text-secondary" : ""}`}
+                  className={`font-bold ${writerRole?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
                 >
                   {writerNickname}
                 </h4>
@@ -195,11 +196,7 @@ export function Post({
                     index < 4 && (
                       <a
                         href={`#post-${id}-image-${index + 1}`}
-                        onClick={() =>
-                          document
-                            .getElementById(`viewer-post-${id}-images`)
-                            .showModal()
-                        }
+                        onClick={handleShowImagesViewer}
                         key={index}
                       >
                         <Image
@@ -212,42 +209,7 @@ export function Post({
                       </a>
                     ),
                 )}
-                <DynamicViewerImages
-                  id={`post-${id}`}
-                  items={images.map((image, index) => (
-                    <div
-                      id={`post-${id}-image-${index + 1}`}
-                      className="carousel-item w-full items-center justify-center"
-                      key={index}
-                    >
-                      <picture className="relative py-10">
-                        <img
-                          className="absolute w-full rounded-2xl blur-lg"
-                          src={image.source}
-                          alt={image.alternate}
-                          width="100%"
-                          height="100%"
-                        />
-                        <img
-                          className="relative w-full rounded-2xl"
-                          src={image.source}
-                          alt={image.alternate}
-                          width="100%"
-                          height="100%"
-                        />
-                      </picture>
-                    </div>
-                  ))}
-                  indicators={images.map((_, index) => (
-                    <a
-                      href={`#post-${id}-image-${index + 1}`}
-                      className="btn btn-xs"
-                      key={index}
-                    >
-                      {index + 1}
-                    </a>
-                  ))}
-                />
+                <ImagesViewer id={`post-${id}`} images={images} ref={ref} />
               </div>
             )}
           </div>
