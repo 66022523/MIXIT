@@ -6,7 +6,7 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import { ProfileProvider } from "./_contexts/profileContext";
+import { ProfileProvider } from "@/contexts/profileContext";
 
 import config from "@/config";
 
@@ -64,7 +64,7 @@ export default async function SettingsLayout({ children }) {
         </div>
       </div>
       <div className="col-span-3">
-        <ProfileProvider>{children}</ProfileProvider>
+        <ProfileProvider id={user.id}>{children}</ProfileProvider>
       </div>
     </div>
   );

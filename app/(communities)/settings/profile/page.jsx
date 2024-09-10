@@ -14,7 +14,7 @@ import {
 import { UserIcon as UserSolidIcon } from "@heroicons/react/24/solid";
 import { CountryDropdown } from "react-country-region-selector";
 
-import { useProfile } from "../_contexts/profileContext";
+import { useProfile } from "@/contexts/profileContext";
 
 import { updateProfileAction } from "@/lib/actions/user";
 
@@ -72,7 +72,7 @@ export default function ProfileSettings() {
       setCountry(profile.country);
       setSignature(profile.signature);
     }
-  }, [profile])
+  }, [profile]);
 
   return (
     <form className="space-y-4" action={submitAction}>
