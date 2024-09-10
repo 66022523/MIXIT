@@ -4,11 +4,8 @@ import { UserCover } from "./_components/cover";
 import { UserDetail } from "./_components/details";
 import { UserStats } from "./_components/stats";
 import { UserAchievement } from "./_components/achievement";
-import { UserTabs } from "./_components/tabs/tabs";
+import { UserTabs } from "./_components/tabs";
 
-import config from "@/config";
-
-import supabase from "@/utils/supabase";
 import { createClient } from "@/utils/supabase/server";
 
 async function getProfile(id) {
@@ -62,22 +59,6 @@ async function getFollowers(id) {
     .single();
 
   return data;
-}
-
-export async function generateStaticParams() {
-  const { data } = await supabase.from("users").select();
-
-  return data.map((user) => ({
-    id: user.id,
-  }));
-}
-
-export async function generateMetadata({ params: { id } }) {
-  const profile = await getProfile(id);
-
-  return {
-    title: `${profile?.nickname || "User Not Found"} | ${config.metadata.app}`,
-  };
 }
 
 export default async function Page({ params: { id } }) {
