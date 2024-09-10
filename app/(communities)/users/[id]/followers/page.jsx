@@ -21,7 +21,7 @@ export default async function Followers({ params: { id } }) {
     .eq("follower_id", id);
 
   return (
-    <Sidebar className="p-12">
+    <Sidebar>
       <div className="flex justify-between">
         <Section
           backLink={`/users/${user.id}`}
