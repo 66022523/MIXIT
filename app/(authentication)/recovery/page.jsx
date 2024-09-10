@@ -11,6 +11,8 @@ import { WrenchIcon } from "@heroicons/react/24/solid";
 
 import { recoveryAction } from "@/lib/actions/auth";
 
+import config from "@/config";
+
 export default function Page() {
   const [status, setStatus] = useState();
 
@@ -47,12 +49,12 @@ export default function Page() {
           className="input input-bordered w-full"
           name="newPassword"
           required
-          pattern={validation.passwordRegex}
-          minLength={validation.passwordMinLength}
+          pattern={config.validation.passwordRegex}
+          minLength={config.validation.passwordMinLength}
         />
         <div className="label">
           <span className="label-text-alt text-start">
-            Minimum {validation.passwordMinLength} characters, lowercase,
+            Minimum {config.validation.passwordMinLength} characters, lowercase,
             uppercase letters, digits and symbols
           </span>
         </div>
