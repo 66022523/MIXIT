@@ -25,7 +25,6 @@ export function SignUp() {
       const status = await signUpAction(formData);
 
       setStatus(status);
-      router.back();
     });
   };
 
