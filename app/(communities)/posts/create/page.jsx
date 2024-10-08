@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Bars3BottomLeftIcon, FireIcon } from "@heroicons/react/24/solid";
+import { Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
 import { Section } from "@/components/section";
 import { Placeholder } from "@/components/empty";
 import { Post, PostPlaceholder } from "@/components/post";
 import { createClient } from "@/utils/supabase/server";
 import Input from "@/components/CreatePostModal";
+import { FireIcon } from "@heroicons/react/24/solid";
 
 export default async function Communities() {
   const supabase = createClient();
@@ -20,19 +21,15 @@ export default async function Communities() {
     writer:users!posts_writer_id_fkey (*)
   `);
 
-  const hotTopics = [
-    { id: "new-game", name: "NEWGAME", posts: 0, members: 0 },
-    { id: "open-world", name: "OPENWORLD", posts: 0, members: 0 },
-    { id: "mmo-rpg", name: "MMORPG", posts: 0, members: 0 },
-  ];
+  const { data: tags } = await supabase.from("tags").select();
 
   return (
-    <div className="container mx-auto grid grid-cols-12 gap-12 p-4 lg:p-12">
-      <div className="col-span-8">
+    <div className="container mx-auto flex gap-8 p-4 lg:p-8">
+      <div className="flex-1">
         <Section Icon={Bars3BottomLeftIcon} title="Posts" />
         <Input />
         {posts?.length ? (
-          <div className="rounded-2xl bg-base-100">
+          <div className="rounded-xl bg-base-100">
             {posts.map((post, index) => (
               <Post
                 id={post.id}
@@ -61,28 +58,35 @@ export default async function Communities() {
         )}
       </div>
 
-      <div className="col-span-3">
+      <div className="w-1/4">
         <div className="card bg-base-100 p-4">
           <h2 className="flex items-center text-xl font-bold">
             <FireIcon className="mr-2 h-6 w-6 text-red-500" />
             Hot Topics
           </h2>
           <ul>
-            {hotTopics.map((topic, index) => (
-              <li key={index} className="my-2">
-                <Link
-                  href={`/topics/${topic.id}`}
-                  className="flex items-center text-primary"
-                >
-                  #{topic.name}
-                </Link>
-                <span className="text-sm text-gray-500">
-                  - {topic.posts} posts • {topic.members} members
-                </span>
-              </li>
-            ))}
+            {tags?.length ? (
+              tags.map((tag) => (
+                <Fragment key={tag.id}>
+                  <li className="my-2">
+                    <Link href={`/topics/${tag.id}`} className="flex items-center text-primary">
+                      #{tag.name}
+                    </Link>
+                    <span className="text-sm text-gray-500">
+                      - {tag.posts?.length || 0} posts
+                    </span>
+                  </li>
+                </Fragment>
+              ))
+            ) : (
+              <Placeholder title="Empty Tags" description="There are currently no tags." />
+            )}
           </ul>
-          <button className="btn btn-primary mt-4">View More</button>
+          <div className="card-actions">
+            <Link href="/tags" className="btn btn-primary w-full">
+              View More
+            </Link>
+          </div>
         </div>
 
         <div className="mt-8 text-gray-400">
@@ -93,17 +97,17 @@ export default async function Communities() {
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-primary">
+              <Link href="/agreements/terms" className="text-primary">
                 Terms of Services
               </Link>
             </li>
             <li>
-              <Link href="/privacy" className="text-primary">
-                Privacy of Policy
+              <Link href="/agreements/privacy" className="text-primary">
+                Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="/cookies" className="text-primary">
+              <Link href="/agreements/cookies" className="text-primary">
                 Cookies Policy
               </Link>
             </li>
