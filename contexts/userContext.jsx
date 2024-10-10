@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, createContext, useContext } from "react";
 
-import { getUser as getAuthUser } from "@/lib/queries/auth";
+import { getUser } from "@/lib/queries/auth";
 
 const UserContext = createContext();
 
@@ -10,7 +10,7 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     const getUserData = async () => {
-      const { user } = await getAuthUser();
+      const { user } = await getUser();
       setUser(user);
     };
     getUserData();
