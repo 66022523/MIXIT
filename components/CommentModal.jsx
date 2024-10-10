@@ -19,8 +19,8 @@ export default function CommentModal() {
     const filePickerRef = useRef(null);
 
     const fetchGIFs = () => {
-        const apiKey = "AIzaSyBG21gwUiktLGJoqfELhhO1bOXd9DaKFnE";
-        const clientKey = "884899752733-n6v87439qsjcv6ftph6nc70018oeqkk3.apps.googleusercontent.com";
+        const apiKey = process.env.NEXT_PUBLIC_TENOR_API_KEY;
+        const clientKey = process.env.NEXT_PUBLIC_TENOR_CLIENT_KEY;
         const limit = 8;
         const searchUrl = `https://tenor.googleapis.com/v2/search?q=${searchTerm}&key=${apiKey}&client_key=${clientKey}&limit=${limit}`;
 
