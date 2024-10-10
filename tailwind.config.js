@@ -28,6 +28,7 @@ module.exports = {
           success: "#17C964",
           warning: "#F5A524",
           error: "#F31260",
+          text: "#1a202c",
         },
         dark: {
           ...dark,
@@ -36,6 +37,7 @@ module.exports = {
           success: "#17C964",
           warning: "#F5A524",
           error: "#F31260",
+          text: "#ffffff",
         },
       },
     ],
