@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -54,6 +54,7 @@ export default function CreatePostModal() {
         if (loading) return;
         setLoading(true);
 
+        const supabase = createClient();
         const { data, error } = await supabase
             .from("posts")
             .insert({
