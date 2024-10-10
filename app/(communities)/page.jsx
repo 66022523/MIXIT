@@ -11,12 +11,14 @@ import { Placeholder } from "@/components/empty";
 import { Circle, CirclePlaceholder } from "@/components/circle";
 import { Post, PostPlaceholder } from "@/components/post";
 
-import { createClient } from "@/utils/supabase/server";
+import { getUser } from "@/lib/queries/auth";
+import { getCircles } from "@/lib/queries/circles";
+import { getPosts } from "@/lib/queries/posts";
 
 export default async function Communities() {
-  const supabase = createClient();
-  const { data: circles } = await supabase.from("circles").select();
-  const { data: posts } = await supabase.from("posts").select(
+  const { user } = await getUser();
+  const circles = await getCircles();
+  const posts = await getPosts(
     `
       id,
       created_at,
@@ -28,10 +30,10 @@ export default async function Communities() {
       history,
       tags (*),
       images,
-      views (users!views_user_id_fkey (*)),
-      likes (users!likes_user_id_fkey (*)),
+      views (user:users!views_user_id_fkey (*)),
+      likes (user:users!likes_user_id_fkey (*)),
       comments (*),
-      shares (users!shares_user_id_fkey (*)),
+      shares (user:users!shares_user_id_fkey (*)),
       writer:users!posts_writer_id_fkey (*),
       circle:circles!posts_circle_id_fkey (*)
     `,
@@ -107,6 +109,7 @@ export default async function Communities() {
           <div className="rounded-2xl bg-base-100">
             {posts.map((post, index) => (
               <Post
+                user={user}
                 id={post.id}
                 createdAt={post.created_at}
                 title={post.title}
