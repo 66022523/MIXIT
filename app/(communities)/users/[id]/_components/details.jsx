@@ -68,7 +68,7 @@ export function UserDetail({ user, profile }) {
         </div>
       </div>
       <div className="text-end">
-        {user.id === profile.id ? (
+        {user?.id === profile.id ? (
           <Link href="/settings/profile" className="btn">
             Edit Profile
           </Link>
