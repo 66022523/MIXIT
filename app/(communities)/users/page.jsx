@@ -6,11 +6,10 @@ import { NotFound } from "@/components/empty";
 import { Section } from "@/components/section";
 import { User } from "@/components/user";
 
-import { createClient } from "@/utils/supabase/server";
+import { getUsers } from "@/lib/queries/users";
 
 export default async function Users() {
-  const supabase = createClient();
-  const { data: users } = await supabase.from("users").select();
+  const users = await getUsers();
 
   return (
     <Sidebar className="p-12">

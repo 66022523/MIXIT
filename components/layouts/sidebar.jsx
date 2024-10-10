@@ -8,13 +8,12 @@ import { Placeholder } from "@/components/empty";
 
 import config from "@/config";
 
-import { createClient } from "@/utils/supabase/server";
+import { getCircles } from "@/lib/queries/circles";
+import { getTags } from "@/lib/queries/tags";
 
 export async function Sidebar({ className, children }) {
-  const supabase = createClient();
-
-  const { data: circles } = await supabase.from("circles").select();
-  const { data: tags } = await supabase.from("tags").select();
+  const circles = await getCircles();
+  const tags = await getTags();
 
   return (
     <div
