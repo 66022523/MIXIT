@@ -81,7 +81,9 @@ export async function HeaderNavbar() {
       </div>
       <div className="flex-none">
         <button className="btn btn-circle btn-ghost hidden lg:inline-flex">
-          <PencilIcon className="size-5" />
+          <Link href="/posts/create">
+            <PencilIcon className="size-5" />
+          </Link>
         </button>
         <div className="dropdown dropdown-end hidden lg:block">
           <div tabIndex={0} role="button" className="btn btn-circle btn-ghost">
@@ -102,13 +104,12 @@ export async function HeaderNavbar() {
           <div
             tabIndex={0}
             role="button"
-            className={`btn btn-circle ${
-              user
+            className={`btn btn-circle ${user
                 ? userData?.avatar_url
                   ? "btn-ghost"
                   : "btn-neutral"
                 : "btn-primary"
-            } avatar ${user && userData?.avatar_url ? "" : "placeholder"}`}
+              } avatar ${user && userData?.avatar_url ? "" : "placeholder"}`}
           >
             {user ? (
               <div className="w-10 rounded-full">
