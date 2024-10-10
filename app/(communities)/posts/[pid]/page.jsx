@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
@@ -69,7 +68,7 @@ export default function PostDetail({ params: { pid } }) {
       fetchPost();
       fetchComments();
     }
-  }, [pid]);
+  }, [pid, supabase]);
 
   if (loading) {
     return <p>Loading...</p>;
