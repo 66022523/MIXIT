@@ -1,19 +1,24 @@
-"use client"
-import { useRef } from "react";
+"use client";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
-  ChatBubbleBottomCenterIcon,
   EllipsisVerticalIcon,
+  ChatBubbleBottomCenterIcon,
   EyeIcon,
-  FlagIcon,
-  HeartIcon,
   ShareIcon,
+  HeartIcon,
+  FlagIcon,
 } from "@heroicons/react/24/outline";
 
 import { TagPill, TagPillPlaceholder } from "./tag";
 
 import { ImagesViewer } from "./modals/viewer";
+
+import { updateLikeAction } from "@/lib/actions/post";
+
+import { timeSince } from "@/utils";
 
 export function PostTall({
   id,
@@ -51,6 +56,7 @@ export function PostTall({
 }
 
 export function Post({
+  user,
   id,
   createdAt,
   title,
@@ -71,33 +77,37 @@ export function Post({
   isEnded,
 }) {
   const ref = useRef();
-
-  const timeSince = (input) => {
-    const date = input instanceof Date ? input : new Date(input);
-    const formatter = new Intl.RelativeTimeFormat("en");
-    const ranges = {
-      years: 3600 * 24 * 365,
-      months: 3600 * 24 * 30,
-      weeks: 3600 * 24 * 7,
-      days: 3600 * 24,
-      hours: 3600,
-      minutes: 60,
-      seconds: 1,
-    };
-    const secondsElapsed = (date.getTime() - Date.now()) / 1000;
-
-    for (let key in ranges) {
-      if (ranges[key] < Math.abs(secondsElapsed)) {
-        const delta = secondsElapsed / ranges[key];
-
-        return formatter.format(Math.round(delta), key);
-      }
-    }
-  };
+  const router = useRouter();
+  const [liked, setLiked] = useState({
+    active: likes?.some((like) => like.user.id === user?.id),
+    count: likes?.length || 0,
+  });
 
   const handleShowImagesViewer = () => {
     if (ref.current) ref.current.showModal();
   };
+  const handleLike = async () => {
+    if (!user) return router.push("/sign-in");
+
+    setLiked((like) => ({
+      active: !like.active,
+      count: like.active ? --like.count : ++like.count,
+    }));
+
+    const response = await updateLikeAction(id, likes, user);
+
+    if (response.error) {
+      setLiked((like) => ({
+        active: !like.active,
+        count: like.active ? --like.count : ++like.count,
+      }));
+      return console.log(response);
+    }
+  };
+  const handleComment = () => {
+    if (!user) return router.push("/sign-in");
+  };
+  const handleShare = () => {};
 
   return (
     <>
@@ -165,57 +175,58 @@ export function Post({
               </div>
             </div>
           </div>
-          <div className="space-y-4">
-            <Link href={`/posts/${id}`}>
-              <h3 className="card-title">{title}</h3>
-              <p>{content}</p>
-            </Link>
-            {(circleID || tags) && (
-              <div className="flex flex-wrap gap-2">
-                {circleID && (
-                  <TagPill
-                    isHeader={true}
-                    iconURL={circleIconURL}
-                    name={circleName}
-                    url={`/circles/${circleID}`}
-                  />
-                )}
-                {tags?.map((tag, index) => (
-                  <TagPill
-                    name={tag.name}
-                    url={`/tags/${tag.id}`}
-                    key={index}
-                  />
-                ))}
-              </div>
-            )}
-            {images && (
-              <div className="grid grid-cols-1 grid-rows-1 gap-4 lg:grid-cols-2 lg:grid-rows-2">
+          <Link href={`/posts/${id}`}>
+            <h3 className="card-title">{title}</h3>
+            <p>{content}</p>
+          </Link>
+          {circleID || tags?.length ? (
+            <div className="flex flex-wrap gap-2">
+              {circleID && (
+                <TagPill
+                  isHeader={true}
+                  iconURL={circleIconURL}
+                  name={circleName}
+                  url={`/circles/${circleID}`}
+                />
+              )}
+              {tags?.map((tag, index) => (
+                <TagPill name={tag.name} url={`/tags/${tag.id}`} key={index} />
+              ))}
+            </div>
+          ) : null}
+          {images && (
+            <>
+              <div className="columns-3xs gap-4 space-y-4">
                 {images.map(
                   (image, index) =>
                     index < 4 && (
-                      <a
-                        href={`#post-${id}-image-${index + 1}`}
-                        onClick={handleShowImagesViewer}
-                        key={index}
-                      >
-                        <Image
-                          className={`w-full rounded-box ${index >= 1 ? "hidden lg:block" : ""}`}
-                          src={image.source}
-                          alt={image.alternate}
-                          width={1280}
-                          height={720}
-                        />
-                      </a>
+                      <div onClick={handleShowImagesViewer} key={index}>
+                        <Link href={`/#post-${id}-image-${index + 1}`}>
+                          <Image
+                            className={`${index === 0 || index === 3 ? "aspect-video" : "aspect-square"} w-full rounded-box object-cover`}
+                            src={image.source}
+                            alt={image.alternate}
+                            width={1280}
+                            height={720}
+                          />
+                        </Link>
+                      </div>
                     ),
                 )}
-                <ImagesViewer id={`post-${id}`} images={images} ref={ref} />
               </div>
-            )}
-          </div>
+              <ImagesViewer
+                className="!mt-0"
+                id={`post-${id}`}
+                images={images}
+                ref={ref}
+              />
+            </>
+          )}
           <div className="grid grid-cols-4 gap-2">
-            <div className="flex items-center justify-center gap-2 text-sm text-base-content">
-              <button className="btn btn-disabled btn-circle btn-sm bg-opacity-20 md:btn-md">
+            <div className="flex items-center justify-center gap-2 text-sm">
+              <button
+                className={`btn btn-disabled btn-circle btn-sm md:btn-md ${views?.find((view) => view.user.id === user?.id) ? "btn-active" : "btn-outline"}`}
+              >
                 <EyeIcon className="size-5" />
               </button>
               {Intl.NumberFormat("en-US", {
@@ -224,17 +235,27 @@ export function Post({
               }).format(views?.length || 0)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
-              <button className="btn btn-circle btn-error btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-error-content">
-                <HeartIcon className="size-5" />
+              <button
+                className={`btn btn-circle btn-error btn-sm md:btn-md ${liked.active ? "btn-active" : "btn-outline"}`}
+                onClick={handleLike}
+              >
+                <HeartIcon
+                  className={`size-5 ${liked.active ? "fill-error-content" : ""}`}
+                />
               </button>
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(likes?.length || 0)}
+              }).format(liked.count)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
-              <button className="btn btn-circle btn-primary btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-primary-content">
-                <ChatBubbleBottomCenterIcon className="size-5" />
+              <button
+                className={`btn btn-circle btn-primary btn-sm md:btn-md ${comments?.find((comment) => comment.writer_id === user?.id) ? "btn-active" : "btn-outline"}`}
+                onClick={handleComment}
+              >
+                <ChatBubbleBottomCenterIcon
+                  className={`size-5 ${comments?.find((comment) => comment.writer_id === user?.id) ? "fill-primary-content" : ""}`}
+                />
               </button>
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
@@ -242,7 +263,10 @@ export function Post({
               }).format(comments?.length || 0)}
             </div>
             <div className="flex items-center justify-center gap-2 text-sm">
-              <button className="btn btn-circle btn-primary btn-sm bg-opacity-20 text-base-content md:btn-md hover:text-primary-content">
+              <button
+                className="btn btn-circle btn-outline btn-primary btn-sm md:btn-md"
+                onClick={handleShare}
+              >
                 <ShareIcon className="size-5" />
               </button>
               {Intl.NumberFormat("en-US", {
