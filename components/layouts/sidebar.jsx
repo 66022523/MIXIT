@@ -1,3 +1,4 @@
+"use server"
 import Link from "next/link";
 import { Fragment } from "react";
 import { FireIcon } from "@heroicons/react/24/solid";

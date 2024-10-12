@@ -18,6 +18,11 @@ const nextConfig = {
         hostname: "media.tenor.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+        pathname: "/**",
+      }
     ],
   },
 };
