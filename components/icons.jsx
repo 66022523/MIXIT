@@ -126,3 +126,28 @@ export function Favicon(props) {
     </svg>
   );
 }
+
+export function MarkdownIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="208px"
+      height="128px"
+      viewBox="0 0 208 128"
+      enableBackground="new 0 0 208 128"
+      fill="currentColor"
+    >
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="10"
+        d="M15,5h178c5.523,0,10,4.477,10,10v98c0,5.523-4.477,10-10,10H15  c-5.523,0-10-4.477-10-10V15C5,9.477,9.477,5,15,5z"
+      />
+      <path
+        fill="currentColor"
+        d="M30,98V30h20l20,25l20-25h20v68H90V59L70,84L50,59v39H30z M155,98l-30-33h20V30h20v35h20L155,98z"
+      />
+    </svg>
+  );
+}
