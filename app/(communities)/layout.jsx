@@ -14,7 +14,7 @@ import { Favicon } from "@/components/icons";
 import { getUser } from "@/lib/queries/auth";
 import { getCircles } from "@/lib/queries/users";
 
-export default async function CommunitiesLayout({ authentication, children }) {
+export default async function CommunitiesLayout({ authentication, modal, children }) {
   const { user } = await getUser();
   const { circles } = await getCircles(user?.id);
 
@@ -28,6 +28,7 @@ export default async function CommunitiesLayout({ authentication, children }) {
         <main className="relative size-full overflow-clip rounded-none bg-base-300/80 lg:rounded-tl-2xl">
           <div className="size-full overflow-y-auto lg:absolute">
             {authentication}
+            {modal}
             {children}
           </div>
         </main>
