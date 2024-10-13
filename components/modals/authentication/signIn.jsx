@@ -49,6 +49,13 @@ export function SignIn() {
           required
           disabled={isPending}
         />
+        {status?.errors?.email && (
+          <div className="label">
+            <span className="label-text-alt text-error">
+              {status.errors.email}
+            </span>
+          </div>
+        )}
       </label>
       <label className="form-control w-full">
         <div className="label">
@@ -65,6 +72,13 @@ export function SignIn() {
           required
           disabled={isPending}
         />
+        {status?.errors?.password && (
+          <div className="label">
+            <span className="label-text-alt text-error">
+              {status.errors.password}
+            </span>
+          </div>
+        )}
       </label>
       {status?.message && (
         <div role="alert" className={`alert alert-${status.type}`}>

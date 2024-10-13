@@ -1,13 +1,13 @@
 import { forwardRef } from "react";
-import Link from "next/link"
+import Link from "next/link";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export const ImagesViewer = forwardRef(function ImagesViewer(
-  { id, images },
+  { className, id, images },
   ref,
 ) {
   return (
-    <dialog ref={ref} className="modal backdrop-blur">
+    <dialog ref={ref} className={`modal backdrop-blur ${className}`}>
       <form className="absolute right-2 top-2" method="dialog">
         <button className="btn btn-circle btn-sm">
           <XMarkIcon className="size-5" />

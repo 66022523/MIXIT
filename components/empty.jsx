@@ -1,4 +1,4 @@
-import { CubeTransparentIcon } from "@heroicons/react/24/outline";
+import { CubeTransparentIcon } from "@heroicons/react/24/solid";
 
 import { Code } from "@/components/mockup";
 

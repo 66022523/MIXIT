@@ -1,7 +1,6 @@
 "use client";
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   EnvelopeIcon,
   ExclamationTriangleIcon,
@@ -12,7 +11,6 @@ import {
 import { forgotAction } from "@/lib/actions/auth";
 
 export function Forgot() {
-  const router = useRouter();
   const [status, setStatus] = useState();
 
   const [isPending, startTransition] = useTransition();
@@ -22,7 +20,6 @@ export function Forgot() {
       const status = await forgotAction(formData);
 
       setStatus(status);
-      router.back();
     });
   };
 
@@ -44,6 +41,13 @@ export function Forgot() {
           disabled={isPending}
           className="input input-bordered"
         />
+        {status?.errors?.email && (
+          <div className="label">
+            <span className="label-text-alt text-error">
+              {status.errors.email}
+            </span>
+          </div>
+        )}
       </label>
       {status?.message && (
         <div role="alert" className={`alert alert-${status.type}`}>

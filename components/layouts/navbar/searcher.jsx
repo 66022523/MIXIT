@@ -3,19 +3,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   TagIcon,
-  FunnelIcon,
   Bars3BottomLeftIcon,
   PuzzlePieceIcon,
   UsersIcon,
   ChatBubbleBottomCenterTextIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import { FunnelIcon } from "@heroicons/react/24/solid";
 
 export function Searcher() {
   const router = useRouter();
 
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
+
   const searchOptions = [
     {
       icon: <TagIcon className="size-5" />,

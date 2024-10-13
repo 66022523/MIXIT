@@ -27,7 +27,6 @@
   }
 }
 
-
 @layer utilities {
   .overflow-invisible::-webkit-scrollbar {
     display: none;

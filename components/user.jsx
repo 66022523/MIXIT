@@ -47,7 +47,8 @@ export function User({
               )}
             </h3>
             <p>
-              {country && <span className={`fi fi-${country}`} />} {signature}
+              {country && <span className={`fi fi-${country.toLowerCase()}`} />}{" "}
+              {signature}
             </p>
           </Link>
           <div className="card-actions items-center">
