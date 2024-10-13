@@ -75,11 +75,12 @@ export function Post({
   circleIconURL,
   circleName,
   isEnded,
+  isPreview,
 }) {
   const ref = useRef();
   const router = useRouter();
   const [liked, setLiked] = useState({
-    active: likes?.some((like) => like.user.id === user?.id),
+    active: likes?.some((like) => like.user?.id === user?.id),
     count: likes?.length || 0,
   });
 
@@ -175,10 +176,20 @@ export function Post({
               </div>
             </div>
           </div>
-          <Link href={`/posts/${id}`}>
-            <h3 className="card-title">{title}</h3>
-            <p>{content}</p>
-          </Link>
+          {isPreview ? (
+            <Link href={`/posts/${id}`}>
+              <h1 className="card-title text-2xl">{title}</h1>
+              <div
+                className="line-clamp-6"
+                dangerouslySetInnerHTML={{ __html: content }}
+              />
+            </Link>
+          ) : (
+            <div>
+              <h1 className="card-title text-2xl">{title}</h1>
+              <div dangerouslySetInnerHTML={{ __html: content }} />
+            </div>
+          )}
           {circleID || tags?.length ? (
             <div className="flex flex-wrap gap-2">
               {circleID && (
