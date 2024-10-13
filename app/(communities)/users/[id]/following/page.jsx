@@ -6,28 +6,20 @@ import { Sidebar } from "@/components/layouts/sidebar";
 import { NotFound } from "@/components/empty";
 import { User } from "@/components/user";
 
-import { createClient } from "@/utils/supabase/server";
+import { getProfile, getFollowing } from "@/lib/queries/users";
 
 export default async function Following({ params: { id } }) {
-  const supabase = createClient();
-  const { data: user } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", id)
-    .single();
-  const { data: following } = await supabase
-    .from("followers")
-    .select("user:follower_id (*)")
-    .eq("user_id", id);
+  const profile = await getProfile(id);
+  const following = await getFollowing(id, true);
 
   return (
     <Sidebar>
       <div className="flex justify-between">
         <Section
-          backLink={`/users/${user.id}`}
+          backLink={`/users/${profile.id}`}
           Icon={UsersIcon}
-          title={`${user.nickname} Following`}
-          description={`Users who ${user.nickname} are following.`}
+          title={`${profile.nickname} Following`}
+          description={`Users who ${profile.nickname} are following.`}
         />
         <div className="items-center space-x-2">
           <div className="badge badge-lg gap-2 border-none pl-0">
@@ -77,7 +69,7 @@ export default async function Following({ params: { id } }) {
               <div className="hero-content text-center">
                 <NotFound
                   iconCenter
-                  description={`${user.nickname} hasn't followed anyone at the moment.`}
+                  description={`${profile.nickname} hasn't followed anyone at the moment.`}
                 />
               </div>
             </div>

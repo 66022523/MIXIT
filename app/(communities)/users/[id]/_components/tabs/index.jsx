@@ -3,6 +3,8 @@ import { useState, useCallback, Fragment } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { EyeSlashIcon, FunnelIcon } from "@heroicons/react/24/outline";
 
+import { setSearchParamsString } from "@/utils";
+
 import { UserTabCircles } from "./circles";
 import { UserTabComments } from "./comments";
 import { UserTabLikes } from "./likes";
@@ -58,12 +60,7 @@ export function UserTabs({ user, profile }) {
   ];
 
   const createQueryString = useCallback(
-    (name, value) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
-
-      return params.toString();
-    },
+    (name, value) => setSearchParamsString(searchParams, name, value),
     [searchParams],
   );
   const handleActiveTab = (tab) => {

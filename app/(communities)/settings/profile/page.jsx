@@ -22,6 +22,8 @@ import { Section } from "@/components/section";
 
 import config from "@/config";
 
+import { imageToBase64 } from "@/utils";
+
 export default function ProfileSettings() {
   const profile = useProfile();
 
@@ -57,18 +59,13 @@ export default function ProfileSettings() {
       setStatus(status);
     });
   };
-  const handlePreviewImage = (event, dispatch) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0]);
-    reader.onload = (event) => dispatch(event.target.result);
-  };
 
   useEffect(() => {
     if (profile) {
       setCover(profile.cover_url);
       setAvatar(profile.avatar_url);
       setNickname(profile.nickname);
-      setPronoun(profile.pronouns);
+      setPronoun(profile.pronoun);
       setCountry(profile.country);
       setSignature(profile.signature);
     }
@@ -95,7 +92,9 @@ export default function ProfileSettings() {
               name="cover"
               accept="image/*"
               hidden
-              onChange={(event) => handlePreviewImage(event, setCover)}
+              onChange={async (event) =>
+                setCover(await imageToBase64(event.target.files[0]))
+              }
             />
             <PencilSquareIcon className="size-4" />
           </label>
@@ -127,7 +126,9 @@ export default function ProfileSettings() {
               name="avatar"
               accept="image/*"
               hidden
-              onChange={(event) => handlePreviewImage(event, setAvatar)}
+              onChange={async (event) =>
+                setAvatar(await imageToBase64(event.target.files[0]))
+              }
             />
             Change Avatar
           </label>
@@ -141,8 +142,8 @@ export default function ProfileSettings() {
               Nickname
             </span>
             <span className="label-text-alt">
-              {config.validation.nicknameMaxLength - nickname?.length || 0}/
-              {config.validation.nicknameMaxLength}
+              {config.validation.max_nickname - nickname?.length || 0}/
+              {config.validation.max_nickname}
             </span>
           </div>
           <input
@@ -151,7 +152,7 @@ export default function ProfileSettings() {
             className="input input-bordered w-full"
             name="nickname"
             value={nickname}
-            maxLength={config.validation.nicknameMaxLength}
+            maxLength={config.validation.max_nickname}
             disabled={isPending}
             onChange={(event) => setNickname(event.target.value)}
           />
@@ -204,8 +205,8 @@ export default function ProfileSettings() {
             Signature
           </span>
           <span className="label-text-alt">
-            {config.validation.signatureMaxLength - signature?.length || 0}/
-            {config.validation.signatureMaxLength}
+            {config.validation.max_signature - signature?.length || 0}/
+            {config.validation.max_signature}
           </span>
         </div>
         <textarea
@@ -213,7 +214,7 @@ export default function ProfileSettings() {
           placeholder="Nice to meet you"
           name="signature"
           value={signature}
-          maxLength={config.validation.signatureMaxLength}
+          maxLength={config.validation.max_signature}
           disabled={isPending}
           onChange={(event) => setSignature(event.target.value)}
         />
@@ -239,7 +240,7 @@ export default function ProfileSettings() {
       </p>
       <div className="modal-action justify-center">
         <button type="submit" className="btn btn-primary" disabled={isPending}>
-          {isPending && <span className="loading loading-spinner" />} Update
+          {isPending && <span className="loading loading-spinner" />} Update Profile
         </button>
       </div>
     </form>

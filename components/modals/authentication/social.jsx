@@ -8,7 +8,7 @@ export function Social() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "discord",
       options: {
-        redirectTo: `http://localhost:3000/api/auth/callback`,
+        redirectTo: `${window.location.origin}/api/auth/callback`,
       },
     });
   };
@@ -16,7 +16,7 @@ export function Social() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `http://localhost:3000/api/auth/callback`,
+        redirectTo: `${window.location.origin}/api/auth/callback`,
         queryParams: {
           access_type: "offline",
           prompt: "consent",

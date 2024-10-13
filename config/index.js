@@ -6,10 +6,10 @@ const config = {
     long_description: "A large gaming community from around the world.",
   },
   validation: {
-    nicknameMaxLength: 20,
-    signatureMaxLength: 256,
-    passwordMinLength: 8,
-    passwordRegex:
+    max_nickname: 20,
+    max_signature: 256,
+    min_password: 8,
+    password_regex:
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-+_!@#$%^&*.,?]).{8,}$/,
   },
 };

@@ -1,30 +1,22 @@
 import {
-  MagnifyingGlassCircleIcon,
   PlusIcon,
   UserGroupIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import Image from "next/image";
 
 import { HeaderNavbar } from "@/components/layouts/navbar/header";
 import { FooterNavbar } from "@/components/layouts/navbar/footer";
+import { Favicon } from "@/components/icons";
 
-import { createClient } from "@/utils/supabase/server";
+import { getUser } from "@/lib/queries/auth";
+import { getCircles } from "@/lib/queries/users";
 
-import config from "@/config";
-
-export default async function CommunitiesLayout({ authentication, children }) {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: userCircles } = await supabase
-    .from("users")
-    .select("circles (*)")
-    .eq("id", user?.id)
-    .single();
+export default async function CommunitiesLayout({ authentication, modal, children }) {
+  const { user } = await getUser();
+  const { circles } = await getCircles(user?.id);
 
   return (
     <div className="drawer lg:drawer-open">
@@ -36,6 +28,7 @@ export default async function CommunitiesLayout({ authentication, children }) {
         <main className="relative size-full overflow-clip rounded-none bg-base-300/80 lg:rounded-tl-2xl">
           <div className="size-full overflow-y-auto lg:absolute">
             {authentication}
+            {modal}
             {children}
           </div>
         </main>
@@ -49,10 +42,10 @@ export default async function CommunitiesLayout({ authentication, children }) {
           aria-label="close sidebar"
           className="drawer-overlay"
         />
-        <aside className="min-h-screen bg-base-100/80 text-base-content backdrop-blur-3xl">
+        <aside className="min-h-screen bg-base-100/80 backdrop-blur-3xl">
           <div className="sticky top-0 z-50 hidden bg-base-100 px-2 pt-2 lg:inline-flex">
-            <Link href="/" className="btn btn-ghost text-xl text-primary">
-              {config.metadata.name}
+            <Link href="/" className="btn btn-ghost text-primary">
+              <Favicon className="size-8" />
             </Link>
           </div>
           <ul className="menu">
@@ -82,7 +75,7 @@ export default async function CommunitiesLayout({ authentication, children }) {
               <div className="btn-disabled divider" />
             </li>
             {user &&
-              userCircles.circles?.map((circle, index) => (
+              circles?.map((circle, index) => (
                 <li key={index}>
                   <Link
                     className="lg:btn-circle lg:mx-auto lg:mb-2"

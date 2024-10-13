@@ -10,12 +10,18 @@ import { ProfileProvider } from "@/contexts/profileContext";
 
 import config from "@/config";
 
-import { getUser as getAuthUser } from "@/lib/queries/auth";
+import { getUser } from "@/lib/queries/auth";
 
 export default async function SettingsLayout({ children }) {
-  const { user } = await getAuthUser();
+  const { user } = await getUser();
 
   const menuOptions = [
+    {
+      id: "account",
+      icon: <UserCircleIcon className="size-6" />,
+      name: "Account",
+      userRequired: true,
+    },
     {
       id: "profile",
       icon: <IdentificationIcon className="size-6" />,
@@ -34,19 +40,13 @@ export default async function SettingsLayout({ children }) {
       name: "Privacy",
       userRequired: false,
     },
-    {
-      id: "account",
-      icon: <UserCircleIcon className="size-6" />,
-      name: "Account",
-      userRequired: true,
-    },
   ];
 
   return (
     <div className="grid grid-cols-4 gap-12 p-12">
       <div className="col-span-1">
         <div className="sticky top-12 space-y-4">
-          <ul className="menu rounded-box bg-base-200/80">
+          <ul className="menu rounded-box bg-base-100/80">
             <li className="menu-title">Settings</li>
             {menuOptions.map(
               (option, index) =>
@@ -64,7 +64,7 @@ export default async function SettingsLayout({ children }) {
         </div>
       </div>
       <div className="col-span-3">
-        <ProfileProvider id={user.id}>{children}</ProfileProvider>
+        <ProfileProvider id={user?.id}>{children}</ProfileProvider>
       </div>
     </div>
   );

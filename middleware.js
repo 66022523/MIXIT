@@ -34,7 +34,7 @@ export async function middleware(request) {
   } = await supabase.auth.getUser();
 
   if (user && request.nextUrl.pathname === "/settings")
-    return NextResponse.redirect(new URL("/settings/profile", request.url));
+    return NextResponse.redirect(new URL("/settings/account", request.url));
   if (
     !user &&
     (request.nextUrl.pathname === "/settings" ||

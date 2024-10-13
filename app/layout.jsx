@@ -1,8 +1,7 @@
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter, Kanit } from "next/font/google";
-
-import { ProgressBar } from "@/components/layouts/progressbar";
+import ProgressBar from 'nextjs-toploader';
 
 import config from "@/config";
 
@@ -51,8 +50,8 @@ export default async function RootLayout({ children }) {
           <circle cx="800" cy="150" r="150" fill="oklch(var(--in))" />
           <circle cx="150" cy="400" r="100" fill="oklch(var(--s))" />
         </svg>
+        <ProgressBar height={3} color="oklch(var(--p))" showSpinner={false} />
         {children}
-        <ProgressBar />
         <Analytics />
         <SpeedInsights />
       </body>
