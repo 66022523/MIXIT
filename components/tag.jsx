@@ -39,7 +39,7 @@ export function TagPillPlaceholder({ skeleton }) {
 export function Tag({ id, name, postLength }) {
   return (
     <Link href={`/tags/${id}`} className="link-hover link">
-      <h3># {name}</h3>
+      <h3 className="link link-primary"># {name}</h3>
       <p>
         {Intl.NumberFormat("en-US", {
           notation: "compact",
