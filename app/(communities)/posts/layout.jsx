@@ -1,9 +1,9 @@
-import { Sidebar } from "@/components/layouts/sidebar";
+import { SidePosts } from "@/components/layouts/sidebar";
 
 export default function Layout({ children }) {
   return (
-    <Sidebar className="p-12">
+    <SidePosts className="p-12">
       {children}
-    </Sidebar>
+    </SidePosts>
   );
 }
