@@ -33,7 +33,7 @@ export default async function Communities() {
           <div className="absolute bottom-0 left-0 h-1/4 w-1/4 rounded-bl-2xl rounded-tr-2xl bg-primary" />
           <div className="absolute bottom-0 left-0 h-2/4 w-2/5 rounded-bl-2xl rounded-tr-2xl bg-primary/30" />
           <div className="absolute bottom-0 left-0 h-3/4 w-2/4 rounded-bl-2xl rounded-tr-2xl bg-primary/10 backdrop-blur-md" />
-          <span className="absolute -right-1/4 top-1/4 text-8xl font-bold opacity-10">
+          <span className="absolute -right-1/4 top-1/4 text-8xl font-bold opacity-10 select-none">
             COMMUNITY
           </span>
         </div>
