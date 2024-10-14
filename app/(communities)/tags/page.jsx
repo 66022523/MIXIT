@@ -1,43 +1,35 @@
-import React from 'react';
-import { Tag } from '@/components/tag';
+import { TagIcon } from "@heroicons/react/24/solid";
 
-function Tags() {
-  const historyTags = ['#Tag1', '#Tag2', '#Tag3', '#Tag4'];
-  const popularTags = ['#Tag1', '#Tag2', '#Tag3', '#Tag4'];
-  const lines = Array(75).fill('—').join('');
+import { Tag } from "@/components/tag";
+import { Section } from "@/components/section";
 
-  return (
-    <div className="container mx-auto p-4 lg:p-8 space-y-8">
-      <div>
-        <h1 className="font-bold mb-2">Game community.</h1>
-        <span style={{ whiteSpace: 'nowrap' }}>{lines}</span>
-        <div className="flex gap-2 flex-wrap">
-          {historyTags.map((tag, index) => (
-            <button
-            key={index}
-            className="btn btn-sm no-animation btn-ghost btn-outline"
-          >
-            {tag}
-          </button>
-          ))}
+import { getTags } from "@/lib/queries/tags";
+
+export default async function Tags() {
+  const tags = await getTags("id, name, posts(*)");
+
+  return tags ? (
+    <>
+      <Section Icon={TagIcon} title="Tags" />
+      <div className="card bg-base-100">
+        <div className="card-body">
+          {tags?.length
+            ? tags.map((tag, index) => (
+                <>
+                  <Tag
+                    id={tag.id}
+                    name={tag.name}
+                    postLength={tag.posts?.length || 0}
+                    key={index}
+                  />
+                  {index !== tags.length - 1 && <div className="divider" />}
+                </>
+              ))
+            : ""}
         </div>
       </div>
-      <div>
-        <h1 className="font-bold mb-2">Tags.</h1>
-        <span style={{ whiteSpace: 'nowrap' }}>{lines}</span>
-        <div className="flex gap-2 flex-wrap">
-          {popularTags.map((tag, index) => (
-            <button
-              key={index}
-              className="btn btn-sm no-animation btn-ghost btn-outline"
-            >
-              {tag}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
+    </>
+  ) : (
+    ""
   );
 }
-
-export default Tags;
