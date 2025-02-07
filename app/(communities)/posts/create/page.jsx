@@ -104,7 +104,7 @@ export default function CreatePost() {
               onChange={(event) => setCircle(event.target.value)}
               disabled={isPending}
             >
-              <option disabled selected>
+              <option disabled>
                 Select Community
               </option>
               {circles.map((circle) => (
