@@ -79,14 +79,16 @@ export async function HeaderNavbar() {
         <Searcher />
       </div>
       <div className="flex-none">
-        <div className="tooltip tooltip-bottom" data-tip="New Post">
-          <Link
-            href="/posts/create"
-            className="btn btn-circle btn-ghost hidden lg:inline-flex"
-          >
-            <PencilIcon className="size-5" />
-          </Link>
-        </div>
+        {user && (
+          <div className="tooltip tooltip-bottom" data-tip="New Post">
+            <Link
+              href="/posts/create"
+              className="btn btn-circle btn-ghost hidden lg:inline-flex"
+            >
+              <PencilIcon className="size-5" />
+            </Link>
+          </div>
+        )}
         <div className="tooltip tooltip-bottom" data-tip="Notification">
           <div className="dropdown dropdown-end hidden lg:block">
             <div
