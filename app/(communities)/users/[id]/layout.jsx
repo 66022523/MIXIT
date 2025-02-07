@@ -10,7 +10,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params: { id } }) {
+export async function generateMetadata({ params }) {
+  const { id } = await params;
   const { data: profile } = await supabase
     .from("users")
     .select("nickname")

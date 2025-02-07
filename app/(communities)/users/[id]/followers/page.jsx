@@ -8,7 +8,8 @@ import { User } from "@/components/user";
 
 import { getProfile, getFollowers } from "@/lib/queries/users";
 
-export default async function Followers({ params: { id } }) {
+export default async function Followers({ params }) {
+  const { id } = await params;
   const profile = await getProfile(id);
   const followers = await getFollowers(id);
 

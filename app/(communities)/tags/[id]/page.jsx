@@ -5,7 +5,8 @@ import { Post } from "@/components/post";
 import { getUser } from "@/lib/queries/auth";
 import { getTag } from "@/lib/queries/tags";
 
-export default async function Tag({ params: { id } }) {
+export default async function Tag({ params }) {
+  const { id } = await params;
   const { user } = await getUser();
   const tag = await getTag(
     id,
@@ -47,29 +48,29 @@ export default async function Tag({ params: { id } }) {
       <div className="rounded-xl bg-base-100">
         {tag?.posts?.length
           ? tag.posts.map((post, index) => (
-              <Post
-                user={user}
-                id={post.id}
-                createdAt={post.created_at}
-                title={post.title}
-                content={post.content}
-                tags={post.tags}
-                images={post.images}
-                view={post.views}
-                likes={post.likes}
-                comments={post.comments}
-                shares={post.shares}
-                writerID={post.writer?.id}
-                writerAvatarURL={post.writer?.avatar_url}
-                writerNickname={post.writer?.nickname}
-                writerRole={post.writer?.role}
-                circleID={post.circle?.id}
-                circleIconURL={post.circle?.icon_url}
-                circleName={post.circle?.name}
-                isEnded={index + 1 === tag.posts.length}
-                key={index}
-              />
-            ))
+            <Post
+              user={user}
+              id={post.id}
+              createdAt={post.created_at}
+              title={post.title}
+              content={post.content}
+              tags={post.tags}
+              images={post.images}
+              view={post.views}
+              likes={post.likes}
+              comments={post.comments}
+              shares={post.shares}
+              writerID={post.writer?.id}
+              writerAvatarURL={post.writer?.avatar_url}
+              writerNickname={post.writer?.nickname}
+              writerRole={post.writer?.role}
+              circleID={post.circle?.id}
+              circleIconURL={post.circle?.icon_url}
+              circleName={post.circle?.name}
+              isEnded={index + 1 === tag.posts.length}
+              key={index}
+            />
+          ))
           : ""}
       </div>
     </>

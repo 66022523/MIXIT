@@ -12,7 +12,8 @@ import { Post, PostPlaceholder } from "@/components/post";
 import { getUser } from "@/lib/queries/auth";
 import { getPost } from "@/lib/queries/posts";
 
-export default async function PostDetail({ params: { id } }) {
+export default async function PostDetail({ params }) {
+  const { id } = await params;
   const { user } = await getUser();
   const { data: post, error } = await getPost(id);
 

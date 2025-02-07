@@ -9,7 +9,8 @@ import { UserTabs } from "./_components/tabs";
 import { getUser } from "@/lib/queries/auth";
 import { getProfile, getFollowing, getFollowers } from "@/lib/queries/users";
 
-export default async function Page({ params: { id } }) {
+export default async function Page({ params }) {
+  const { id } = await params;
   const { user } = await getUser();
 
   const profile = await getProfile(

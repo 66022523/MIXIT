@@ -5,9 +5,15 @@ import { Post } from "@/components/post";
 import { getUser } from "@/lib/queries/auth";
 import { getProfile } from "@/lib/queries/users";
 import { getCircle } from "@/lib/queries/circles";
-import { UsersIcon, PlusCircleIcon, ShareIcon, Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
+import {
+  UsersIcon,
+  PlusCircleIcon,
+  ShareIcon,
+  Bars3BottomLeftIcon,
+} from "@heroicons/react/24/solid";
 
-export default async function Circle({ params: { id } }) {
+export default async function Circle({ params }) {
+  const { id } = await params;
   const { user } = await getUser();
   const profile = await getProfile(user?.id);
   const circle = await getCircle(
