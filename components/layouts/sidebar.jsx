@@ -16,7 +16,7 @@ import { getTags } from "@/lib/queries/tags";
 
 export async function Sidebar({ className, children }) {
   const circles = await getCircles();
-  const tags = await getTags("name, posts (*)");
+  const tags = await getTags("id, name, posts (*)");
 
   return (
     <div
