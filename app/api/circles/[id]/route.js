@@ -7,7 +7,17 @@ export async function GET(request, { params }) {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("circles")
-      .select()
+      .select(
+        `
+          *,
+          posts (
+            *,
+            circle:circles!posts_circle_id_fkey (*),
+            writer:users!posts_writer_id_fkey (*)
+          ),
+          member_count:users_circles (count)
+        `,
+      )
       .eq("id", id)
       .single();
 
@@ -27,6 +37,8 @@ export async function GET(request, { params }) {
         },
         { status: 500 },
       );
+    
+    data.member_count = data.member_count[0].count;
 
     return Response.json(data, { status: 200 });
   } catch (error) {
