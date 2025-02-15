@@ -7,7 +7,7 @@ import {
   SignUpFormSchema,
   ForgotFormSchema,
   RecoveryFormSchema,
-} from "@/lib/definitions/auth";
+} from "@/libs/definitions/auth";
 
 import { createClient } from "@/utils/supabase/server";
 

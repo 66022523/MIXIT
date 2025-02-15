@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import config from "@/config";
+import config from "@/configs";
 
 export const SignInFormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }).trim(),
