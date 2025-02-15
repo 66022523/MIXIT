@@ -12,7 +12,7 @@ export async function getUsers() {
   return { data, error: null };
 }
 
-export async function getProfile(id) {
+export async function getUserProfile(id) {
   if (!id) return { data: [], error: "Please provide ID of user." };
 
   const url = new URL(`/api/users/${id}`, configs.base_url);
@@ -24,7 +24,7 @@ export async function getProfile(id) {
   return { data, error: null };
 }
 
-export async function getFollowing(id, count) {
+export async function getUserFollowing(id, count) {
   if (!id) return { user: [], error: "Please provide ID of user." };
 
   const url = new URL(`/api/users/${id}/following`, configs.base_url);
@@ -39,7 +39,7 @@ export async function getFollowing(id, count) {
   return { data, error: null };
 }
 
-export async function getFollowers(id, count) {
+export async function getUserFollowers(id, count) {
   if (!id) return { user: [], error: "Please provide ID of user." };
 
   const url = new URL(`/api/users/${id}/followers`, configs.base_url);
@@ -54,7 +54,7 @@ export async function getFollowers(id, count) {
   return { data, error: null };
 }
 
-export async function getCircles(id) {
+export async function getUserCircles(id) {
   if (!id) return { data: [], error: "Please provide ID of user." };
 
   const url = new URL(`/api/users/${id}/circles`, configs.base_url);
