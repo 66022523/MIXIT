@@ -1,7 +1,8 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   PencilIcon,
   BellIcon,
@@ -13,20 +14,23 @@ import {
 import { createClient } from "@/utils/supabase/client";
 
 export function FooterNavbar() {
-  const router = useRouter();
   const pathname = usePathname();
   const [session, setSession] = useState();
 
   useEffect(() => {
-    const getSession = async () => {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    const supabase = createClient();
 
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-    };
-    getSession();
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (

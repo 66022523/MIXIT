@@ -9,14 +9,16 @@ import { Tag, TagPlaceholder } from "@/components/tag";
 import { Footer } from "@/components/layouts/footer";
 import { Placeholder } from "@/components/empty";
 
-import { getUser } from "@/lib/queries/auth";
-import { getCircles } from "@/lib/queries/circles";
-import { getPosts } from "@/lib/queries/posts";
-import { getTags } from "@/lib/queries/tags";
+import { getUser } from "@/libs/queries/auth";
+import { getCircles } from "@/libs/queries/circles";
+import { getPosts } from "@/libs/queries/posts";
+import { getTags } from "@/libs/queries/tags";
 
 export async function Sidebar({ className, children }) {
-  const circles = await getCircles();
-  const tags = await getTags("id, name, posts (*)");
+  const [{ data: circlesData }, { data: tagsData }] = await Promise.all([
+    getCircles(),
+    getTags(),
+  ]);
 
   return (
     <div
@@ -26,9 +28,9 @@ export async function Sidebar({ className, children }) {
         {children}
       </div>
       <aside className="sticky bottom-0 col-span-4 space-y-4 lg:col-span-1 lg:space-y-12">
-        {circles?.length && (
+        {circlesData.length ? (
           <div className="carousel w-full">
-            {circles.map((circle, index) => {
+            {circlesData.map((circle, index) => {
               return (
                 <div
                   id={circle.id}
@@ -60,13 +62,13 @@ export async function Sidebar({ className, children }) {
                   </Link>
                   <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
                     <Link
-                      href={`#${circle.id === 1 ? circles.length : circle.id - 1}`}
+                      href={`#${circle.id === 1 ? circlesData.length : circle.id - 1}`}
                       className="btn btn-circle btn-sm"
                     >
                       <ChevronLeftIcon className="size-5" />
                     </Link>
                     <Link
-                      href={`#${circle.id === circles.length ? 1 : circle.id + 1}`}
+                      href={`#${circle.id === circlesData.length ? 1 : circle.id + 1}`}
                       className="btn btn-circle btn-sm"
                     >
                       <ChevronRightIcon className="size-5" />
@@ -76,17 +78,17 @@ export async function Sidebar({ className, children }) {
               );
             })}
           </div>
-        )}
+        ) : null}
         <div className="card bg-base-100">
           <div className="card-body space-y-4">
             <h2 className="card-title">
               <FireIcon className="size-8 rounded-full bg-error p-1 text-error-content" />
               Hot Topics
             </h2>
-            {tags?.length ? (
+            {tagsData.length ? (
               <>
                 <ul className="list-none">
-                  {tags.map((tag, index) => (
+                  {tagsData.map((tag, index) => (
                     <Fragment key={index}>
                       <li>
                         <Tag
@@ -95,7 +97,7 @@ export async function Sidebar({ className, children }) {
                           postLength={tag.posts?.length || 0}
                         />
                       </li>
-                      {index + 1 !== tags.length && (
+                      {index + 1 !== tagsData.length && (
                         <li>
                           <div className="divider" />
                         </li>
@@ -140,7 +142,7 @@ export async function Sidebar({ className, children }) {
 
 export async function SidePosts({ className, children }) {
   const { user } = await getUser();
-  const posts = await getPosts();
+  const { data: postsData } = await getPosts();
 
   return (
     <div
@@ -155,8 +157,8 @@ export async function SidePosts({ className, children }) {
             <Bars3BottomLeftIcon className="size-8 rounded-full bg-secondary p-1 text-error-content" />
             Similar Posts
           </h2>
-          {posts?.length ? (
-            posts.map((post, index) => (
+          {postsData.length ? (
+            postsData.map((post, index) => (
               <Post
                 user={user}
                 id={post.id}
@@ -176,7 +178,7 @@ export async function SidePosts({ className, children }) {
                 circleID={post.circle?.id}
                 circleIconURL={post.circle?.icon_url}
                 circleName={post.circle?.name}
-                isEnded={index + 1 === posts.length}
+                isEnded={index + 1 === postsData.length}
                 isPreview={true}
                 compact={true}
                 key={index}

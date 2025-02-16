@@ -10,7 +10,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import { signInAction } from "@/lib/actions/auth";
+import { signInAction } from "@/libs/actions/auth";
 
 export function SignIn() {
   const router = useRouter();

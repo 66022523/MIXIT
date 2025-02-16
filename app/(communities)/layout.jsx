@@ -11,19 +11,29 @@ import { HeaderNavbar } from "@/components/layouts/navbar/header";
 import { FooterNavbar } from "@/components/layouts/navbar/footer";
 import { Favicon } from "@/components/icons";
 
-import { getUser } from "@/lib/queries/auth";
-import { getCircles } from "@/lib/queries/users";
+import { getUserCircles, getUserProfile } from "@/libs/queries/users";
 
-export default async function CommunitiesLayout({ authentication, modal, children }) {
-  const { user } = await getUser();
-  const { circles } = await getCircles(user?.id);
+import { createClient } from "@/utils/supabase/server";
+
+export default async function CommunitiesLayout({
+  authentication,
+  modal,
+  children,
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [{ data: userProfileData }, { data: userCirclesData }] =
+    await Promise.all([getUserProfile(user?.id), getUserCircles(user?.id)]);
 
   return (
     <div className="drawer lg:drawer-open">
       <input id="drawer-side" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
         <header className="sticky left-0 top-0 z-50 w-full">
-          <HeaderNavbar />
+          <HeaderNavbar user={user} profile={userProfileData} />
         </header>
         <main className="relative size-full overflow-clip rounded-none bg-base-300/80 lg:rounded-tl-2xl">
           <div className="size-full overflow-y-auto lg:absolute">
@@ -52,7 +62,7 @@ export default async function CommunitiesLayout({ authentication, modal, childre
             <li>
               <Link
                 className="lg:mx-auto"
-                href={user ? `/users/${user.id}/following` : "/sign-in"}
+                href={user ? `/users/${user?.id}/following` : "/sign-in"}
               >
                 <div className="tooltip tooltip-bottom" data-tip="Following">
                   <UsersIcon className="size-6" />
@@ -63,7 +73,7 @@ export default async function CommunitiesLayout({ authentication, modal, childre
             <li>
               <Link
                 className="lg:mx-auto"
-                href={user ? `/users/${user.id}/followers` : "/sign-in"}
+                href={user ? `/users/${user?.id}/followers` : "/sign-in"}
               >
                 <div className="tooltip tooltip-bottom" data-tip="Followers">
                   <UserGroupIcon className="size-6" />
@@ -75,7 +85,7 @@ export default async function CommunitiesLayout({ authentication, modal, childre
               <div className="btn-disabled divider" />
             </li>
             {user &&
-              circles?.map((circle, index) => (
+              userCirclesData.map((circle, index) => (
                 <li key={index}>
                   <Link
                     className="lg:btn-circle lg:mx-auto lg:mb-2"
@@ -113,7 +123,10 @@ export default async function CommunitiesLayout({ authentication, modal, childre
               </Link>
             </li>
             <li>
-              <Link className="lg:btn-circle lg:mx-auto" href={user ? "/circles/add" : "/sign-in"}>
+              <Link
+                className="lg:btn-circle lg:mx-auto"
+                href={user ? "/circles/add" : "/sign-in"}
+              >
                 <div
                   className="btn btn-circle btn-primary btn-sm tooltip tooltip-bottom inline-flex lg:btn-md"
                   data-tip="Add Community"

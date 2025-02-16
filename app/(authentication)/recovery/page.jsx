@@ -8,9 +8,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
-import { recoveryAction } from "@/lib/actions/auth";
+import { recoveryAction } from "@/libs/actions/auth";
 
-import config from "@/config";
+import configs from "@/configs";
 
 export default function Page() {
   const [status, setStatus] = useState();
@@ -53,8 +53,8 @@ export default function Page() {
               className="input input-bordered w-full"
               name="newPassword"
               required
-              pattern={config.validation.password_regex}
-              minLength={config.validation.min_password}
+              pattern={configs.validation.password_regex}
+              minLength={configs.validation.min_password}
             />
             <div className="label">
               <span
@@ -70,7 +70,7 @@ export default function Page() {
                     </ul>
                   </>
                 ) : (
-                  `Minimum ${config.validation.min_password} characters, lowercase, uppercase letters, digits and symbols`
+                  `Minimum ${configs.validation.min_password} characters, lowercase, uppercase letters, digits and symbols`
                 )}
               </span>
             </div>

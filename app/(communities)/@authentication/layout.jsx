@@ -9,7 +9,7 @@ import {
 
 import { Social } from "@/components/modals/authentication/social";
 
-import config from "@/config";
+import configs from "@/configs";
 
 export default function Layout({ children }) {
   const router = useRouter();
@@ -42,8 +42,11 @@ export default function Layout({ children }) {
             </button>
           </form>
         </div>
-        <Link href="/" className="btn btn-ghost text-4xl font-bold text-primary">
-          {config.metadata.name}
+        <Link
+          href="/"
+          className="btn btn-ghost text-4xl font-bold text-primary"
+        >
+          {configs.metadata.name}
         </Link>
         {children}
         <Social />

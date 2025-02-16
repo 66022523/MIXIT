@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request) {
+  // Supabase Middleware
   let response = NextResponse.next({
     request,
   });
@@ -29,30 +30,32 @@ export async function middleware(request) {
     },
   );
 
+  // System Middleware
+  const pathname = request.nextUrl.pathname
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user && request.nextUrl.pathname === "/settings")
+  if (user && pathname === "/settings")
     return NextResponse.redirect(new URL("/settings/account", request.url));
   if (
     !user &&
-    (request.nextUrl.pathname === "/settings" ||
-      request.nextUrl.pathname.startsWith("/settings/profile") ||
-      request.nextUrl.pathname.startsWith("/settings/security") ||
-      request.nextUrl.pathname.startsWith("/settings/account"))
+    (pathname === "/settings" ||
+      pathname.startsWith("/settings/profile") ||
+      pathname.startsWith("/settings/security") ||
+      pathname.startsWith("/settings/account"))
   )
     return NextResponse.redirect(new URL("/settings/privacy", request.url));
   if (
     user &&
-    (request.nextUrl.pathname.startsWith("/sign-in") ||
-      request.nextUrl.pathname.startsWith("/sign-up") ||
-      request.nextUrl.pathname.startsWith("/forgot"))
+    (pathname.startsWith("/sign-in") ||
+      pathname.startsWith("/sign-up") ||
+      pathname.startsWith("/forgot"))
   )
     return NextResponse.redirect(new URL("/", request.url));
   if (
     !user?.app_metadata?.recovery_password &&
-    request.nextUrl.pathname.startsWith("/recovery")
+    pathname.startsWith("/recovery")
   )
     return NextResponse.redirect(new URL("/", request.url));
 

@@ -5,7 +5,7 @@ import {
   LockClosedIcon,
 } from "@heroicons/react/24/solid";
 
-import { getUser } from "@/lib/queries/auth";
+import { getUser } from "@/libs/queries/auth";
 
 export default async function PrivacySettings() {
   const { user } = await getUser();

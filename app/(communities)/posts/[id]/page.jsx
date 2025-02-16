@@ -9,39 +9,39 @@ import {
 import { Placeholder } from "@/components/empty";
 import { Post, PostPlaceholder } from "@/components/post";
 
-import { getUser } from "@/lib/queries/auth";
-import { getPost } from "@/lib/queries/posts";
+import { getUser } from "@/libs/queries/auth";
+import { getPost } from "@/libs/queries/posts";
 
 export default async function PostDetail({ params }) {
   const { id } = await params;
   const { user } = await getUser();
-  const { data: post, error } = await getPost(id);
+  const { data: postData, error } = await getPost(id);
 
   if (error) console.error(error);
 
   return (
     <>
-      {post && !error ? (
+      {postData && !error ? (
         <div className="space-y-4 rounded-2xl bg-base-100 pb-4">
           <Post
             user={user}
-            id={post.id}
-            createdAt={post.created_at}
-            title={post.title}
-            content={post.content}
-            tags={post.tags}
-            images={post.images}
-            view={post.views}
-            likes={post.likes}
-            comments={post.comments}
-            shares={post.shares}
-            writerID={post.writer?.id}
-            writerAvatarURL={post.writer?.avatar_url}
-            writerNickname={post.writer?.nickname}
-            writerRole={post.writer?.role}
-            circleID={post.circle?.id}
-            circleIconURL={post.circle?.icon_url}
-            circleName={post.circle?.name}
+            id={postData.id}
+            createdAt={postData.created_at}
+            title={postData.title}
+            content={postData.content}
+            tags={postData.tags}
+            images={postData.images}
+            view={postData.views}
+            likes={postData.likes}
+            comments={postData.comments}
+            shares={postData.shares}
+            writerID={postData.writer?.id}
+            writerAvatarURL={postData.writer?.avatar_url}
+            writerNickname={postData.writer?.nickname}
+            writerRole={postData.writer?.role}
+            circleID={postData.circle?.id}
+            circleIconURL={postData.circle?.icon_url}
+            circleName={postData.circle?.name}
             isEnded={true}
           />
 
@@ -66,8 +66,8 @@ export default async function PostDetail({ params }) {
           </div>
 
           <div className="space-y-4 px-8 pb-4">
-            {post?.comments?.length > 0 ? (
-              post?.comments?.map((comment, index) => (
+            {postData?.comments?.length > 0 ? (
+              postData?.comments?.map((comment, index) => (
                 <div key={index} className="card bg-base-200 p-4">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">

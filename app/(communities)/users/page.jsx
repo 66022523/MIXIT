@@ -6,10 +6,10 @@ import { NotFound } from "@/components/empty";
 import { Section } from "@/components/section";
 import { User } from "@/components/user";
 
-import { getUsers } from "@/lib/queries/users";
+import { getUsers } from "@/libs/queries/users";
 
 export default async function Users() {
-  const users = await getUsers();
+  const { data: usersData } = await getUsers();
 
   return (
     <Sidebar className="p-12">
@@ -25,7 +25,7 @@ export default async function Users() {
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(users?.length ?? 0)}
+              }).format(usersData?.length ?? 0)}
             </div>
             Members
           </div>
@@ -49,8 +49,8 @@ export default async function Users() {
       </div>
       <div className="card bg-base-100">
         <div className="card-body">
-          {users?.length ? (
-            users?.map((user, index) => (
+          {usersData?.length ? (
+            usersData?.map((user, index) => (
               <User
                 id={user.id}
                 avatarURL={user.avatar_url}
@@ -58,7 +58,7 @@ export default async function Users() {
                 role={user.role}
                 country={user.country}
                 signature={user.signature}
-                isEnded={index + 1 === users.length}
+                isEnded={index + 1 === usersData.length}
                 key={index}
               />
             ))

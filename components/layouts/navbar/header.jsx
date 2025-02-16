@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,26 +15,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 
-import { signOutAction } from "@/lib/actions/auth";
+import { signOutAction } from "@/libs/actions/auth";
 
 import { Searcher } from "@/components/layouts/navbar/searcher";
 import { Themes } from "@/components/layouts/navbar/themes";
 import { Favicon } from "@/components/icons";
 
-import { createClient } from "@/utils/supabase/server";
-
-export async function HeaderNavbar() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: userData } = await supabase
-    .from("users")
-    .select()
-    .eq("id", user?.id)
-    .single();
-
+export function HeaderNavbar({ user, profile }) {
   const pages = [
     {
       name: "Circles",
@@ -79,7 +68,7 @@ export async function HeaderNavbar() {
         <Searcher />
       </div>
       <div className="flex-none">
-        {user && (
+        {user ? (
           <div className="tooltip tooltip-bottom" data-tip="New Post">
             <Link
               href="/posts/create"
@@ -88,7 +77,7 @@ export async function HeaderNavbar() {
               <PencilIcon className="size-5" />
             </Link>
           </div>
-        )}
+        ) : null}
         <div className="tooltip tooltip-bottom" data-tip="Notification">
           <div className="dropdown dropdown-end hidden lg:block">
             <div
@@ -161,23 +150,23 @@ export async function HeaderNavbar() {
               role="button"
               className={`btn btn-circle ${
                 user
-                  ? userData?.avatar_url
+                  ? profile?.avatar_url
                     ? "btn-ghost"
                     : "btn-neutral"
                   : "btn-primary"
-              } avatar ${user && userData?.avatar_url ? "" : "placeholder"}`}
+              } avatar ${user && profile?.avatar_url ? "" : "placeholder"}`}
             >
               {user ? (
                 <div className="w-10 rounded-full">
-                  {userData?.avatar_url ? (
+                  {profile?.avatar_url ? (
                     <Image
-                      alt={userData.nickname}
-                      src={userData.avatar_url}
+                      alt={profile.nickname}
+                      src={profile.avatar_url}
                       width={40}
                       height={40}
                     />
                   ) : (
-                    <span>{userData?.nickname?.charAt(0)}</span>
+                    <span>{profile?.nickname?.charAt(0)}</span>
                   )}
                 </div>
               ) : (
@@ -188,11 +177,11 @@ export async function HeaderNavbar() {
               {user ? (
                 <>
                   <li
-                    className={`menu-title ${userData?.role?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
+                    className={`menu-title ${profile?.role?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
                   >
-                    {userData?.nickname}
+                    {profile?.nickname}
                   </li>
-                  {userData?.role?.toLowerCase() === "admin" && (
+                  {profile?.role?.toLowerCase() === "admin" && (
                     <li>
                       <Link href="/dashboard">
                         <WindowIcon className="size-5" /> Dashboard

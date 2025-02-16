@@ -1,3 +1,5 @@
+"use client"
+
 import { CubeTransparentIcon } from "@heroicons/react/24/solid";
 
 import { Code } from "@/components/mockup";

@@ -12,7 +12,16 @@ import { UserTabPosts } from "./posts";
 import { UserTabReports } from "./reports";
 import { UserTabViews } from "./views";
 
-export function UserTabs({ user, profile }) {
+export function UserTabs({
+  user,
+  profile,
+  circles,
+  comments,
+  likes,
+  posts,
+  reports,
+  views,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,37 +34,37 @@ export function UserTabs({ user, profile }) {
       name: "Circles",
       value: "circles",
       private: false,
-      content: UserTabCircles,
+      content: <UserTabCircles circles={circles} />,
     },
     {
       name: "Posts",
       value: "posts",
       private: false,
-      content: UserTabPosts,
+      content: <UserTabPosts posts={posts} />,
     },
     {
       name: "Views",
       value: "views",
       private: true,
-      content: UserTabViews,
+      content: <UserTabViews views={views} />,
     },
     {
       name: "Likes",
       value: "likes",
       private: false,
-      content: UserTabLikes,
+      content: <UserTabLikes likes={likes} />,
     },
     {
       name: "Comments",
       value: "comments",
       private: false,
-      content: UserTabComments,
+      content: <UserTabComments comments={comments} />,
     },
     {
       name: "Reports",
       value: "reports",
       private: true,
-      content: UserTabReports,
+      content: <UserTabReports reports={reports} />,
     },
   ];
 
@@ -140,7 +149,7 @@ export function UserTabs({ user, profile }) {
               role="tabpanel"
               className="tab-content space-y-6 !rounded-box border-base-300 bg-base-100 p-6"
             >
-              <option.content profile={profile} />
+              {option.content}
             </div>
           </Fragment>
         ))}

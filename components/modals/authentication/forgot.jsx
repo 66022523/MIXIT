@@ -8,7 +8,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import { forgotAction } from "@/lib/actions/auth";
+import { forgotAction } from "@/libs/actions/auth";
 
 export function Forgot() {
   const [status, setStatus] = useState();

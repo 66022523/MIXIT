@@ -10,9 +10,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { InboxIcon } from "@heroicons/react/24/solid";
 
-import { signUpAction } from "@/lib/actions/auth";
+import { signUpAction } from "@/libs/actions/auth";
 
-import config from "@/config";
+import config from "@/configs";
 
 export function SignUp() {
   const [status, setStatus] = useState();

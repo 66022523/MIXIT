@@ -1,11 +1,11 @@
 import { CommentTall } from "@/components/comments";
 import { Empty } from "@/components/empty";
 
-export function UserTabComments({ profile }) {
+export function UserTabComments({ comments }) {
   return (
     <>
-      {profile.comments?.length ? (
-        profile.comments.map((comment, index) => (
+      {comments?.length ? (
+        comments.map((comment, index) => (
           <CommentTall
             postID={comment.post.id}
             postImageSource={comment.post.images[0].source}

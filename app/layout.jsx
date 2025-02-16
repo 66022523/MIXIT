@@ -1,9 +1,9 @@
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Inter, Kanit } from "next/font/google";
-import ProgressBar from 'nextjs-toploader';
+import ProgressBar from "nextjs-toploader";
 
-import config from "@/config";
+import config from "@/configs";
 
 import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
@@ -34,7 +34,7 @@ export const metadata = {
   description: config.metadata.long_description,
 };
 
-export default async function RootLayout({ children }) {
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body

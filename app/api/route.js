@@ -1,10 +1,30 @@
 import { createClient } from "@/utils/supabase/server";
 
-export default async function GET() {
+export async function GET(request) {
   try {
-    createClient();
-    return Response.json({ connected: true }, { status: 200 });
+    const supabase = createClient();
+
+    // Perform a simple query to check the database connection
+    const { data, error } = await supabase
+      .from("circles")
+      .select("count (*)", { count: "exact" });
+
+    if (error) {
+      throw new Error("Database connection failed");
+    }
+
+    return Response.json(
+      {
+        status: "healthy",
+        message: "API is working and database is connected",
+      },
+      { status: 200 },
+    );
   } catch (error) {
-    return Response.json({ connected: false, error }, { status: 500 });
+    console.error("Health check failed:", error);
+    return Response.json(
+      { status: "unhealthy", message: error.message },
+      { status: 503 },
+    );
   }
 }
