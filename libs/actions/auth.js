@@ -12,7 +12,7 @@ import {
 import { createClient } from "@/utils/supabase/server";
 
 export const signInAction = async (formData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const validatedFields = SignInFormSchema.safeParse({
     email: formData.get("email"),
@@ -89,7 +89,7 @@ export const signInAction = async (formData) => {
 };
 
 export const signUpAction = async (formData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const validatedFields = SignUpFormSchema.safeParse({
     email: formData.get("email"),
@@ -223,7 +223,7 @@ export const signUpAction = async (formData) => {
 };
 
 export const forgotAction = async (formData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const validatedFields = ForgotFormSchema.safeParse({
     email: formData.get("email"),
@@ -274,7 +274,7 @@ export const forgotAction = async (formData) => {
 };
 
 export const recoveryAction = async (formData) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const validatedFields = RecoveryFormSchema.safeParse({
     newPassword: formData.get("newPassword"),
@@ -323,7 +323,7 @@ export const recoveryAction = async (formData) => {
 };
 
 export const signOutAction = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   await supabase.auth.signOut();
   revalidatePath("/");
