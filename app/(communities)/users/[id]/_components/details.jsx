@@ -29,7 +29,7 @@ export function UserDetail({ user, profile }) {
               />
             ) : (
               profile.nickname && (
-                <span className="text-3xl">{profile.nickname.charAt(0)}</span>
+                <span className="text-3xl">{profile.nickname?.charAt(0)}</span>
               )
             )}
           </div>
@@ -37,7 +37,7 @@ export function UserDetail({ user, profile }) {
         <div>
           <h1 className="font-bold">
             {profile.nickname}{" "}
-            {profile.role.toLowerCase() !== "user" && (
+            {profile.role?.toLowerCase() !== "user" && (
               <span className="badge badge-secondary align-middle">
                 {profile.role}
               </span>

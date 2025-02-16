@@ -16,7 +16,35 @@ import {
   getUserViews,
 } from "@/libs/queries/users";
 
+import config from "@/configs";
+
 import { createClient } from "@/utils/supabase/server";
+import supabase from "@/utils/supabase";
+
+export const revalidate = 60;
+
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const { data: users } = await supabase.from("users").select("id");
+
+  return users.map((user) => ({
+    id: user.id,
+  }));
+}
+
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const { data: profile } = await supabase
+    .from("users")
+    .select("nickname")
+    .eq("id", id)
+    .single();
+
+  return {
+    title: `${profile?.nickname || "User Not Found"} | ${config.metadata.app}`,
+  };
+}
 
 export default async function UserPage({ params }) {
   const { id } = await params;
@@ -43,7 +71,7 @@ export default async function UserPage({ params }) {
     getUserViews(session, id),
   ]);
 
-  if (!userProfileData) notFound();
+  if (!userProfileData.length) notFound();
 
   return (
     <>
