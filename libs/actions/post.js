@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
 export const postAction = async (formData, content, tags) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -68,7 +68,7 @@ export const postAction = async (formData, content, tags) => {
 };
 
 export const updateLikeAction = async (post_id, likes, user) => {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   if (!user) return;
   if (likes.some((like) => like.user.id === user.id)) {
