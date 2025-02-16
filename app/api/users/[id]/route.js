@@ -11,29 +11,14 @@ export async function GET(request, { params }) {
         `
           *,
           circles (*),
-          comments (
-            *,
-            post:posts!comments_post_id_fkey(*)
-          ),
-          followers:followers_user_id_fkey (*),
-          following:followers_follower_id_fkey (*),
-          likes (
-            created_at,
-            post:posts!likes_post_id_fkey (*),
-            comment:comments!likes_comment_id_fkey (*)
-          ),
-          posts (*),
-          reports!reports_user_id_fkey (id),
-          shares (
-            created_at,
-            post:posts!shares_post_id_fkey (*),
-            comment:comments!shares_comment_id_fkey (*)
-          ),
-          views (
-            created_at,
-            post:posts!views_post_id_fkey (*),
-            comment:comments!views_comment_id_fkey (*)
-          )
+          comments (count),
+          followers:followers_follower_id_fkey (count),
+          following:followers_user_id_fkey (count),
+          likes (count),
+          posts (count),
+          reports!reports_user_id_fkey (count),
+          shares (count),
+          views (count)
         `,
       )
       .eq("id", id)
@@ -55,6 +40,23 @@ export async function GET(request, { params }) {
         },
         { status: 500 },
       );
+
+    const countFields = [
+      "circles",
+      "comments",
+      "followers",
+      "following",
+      "likes",
+      "posts",
+      "reports",
+      "shares",
+      "views",
+    ];
+
+    countFields.forEach((field) => {
+      data[`${field}_count`] = data[field][0].count;
+      delete data[field];
+    });
 
     return Response.json(data, { status: 200 });
   } catch (error) {
