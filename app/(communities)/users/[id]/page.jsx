@@ -71,7 +71,7 @@ export default async function UserPage({ params }) {
     getUserViews(session, id),
   ]);
 
-  if (!userProfileData.length) notFound();
+  if (!userProfileData) notFound();
 
   return (
     <>

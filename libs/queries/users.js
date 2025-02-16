@@ -13,13 +13,13 @@ export async function getUsers() {
 }
 
 export async function getUserProfile(id) {
-  if (!id) return { data: [], error: "Please provide ID of user." };
+  if (!id) return { data: {}, error: "Please provide ID of user." };
 
   const url = new URL(`/api/users/${id}`, configs.base_url);
   const response = await fetch(url.toString());
   const data = await response.json();
 
-  if (!response.ok) return { data: [], error: data };
+  if (!response.ok) return { data: {}, error: data };
 
   return { data, error: null };
 }
