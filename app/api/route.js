@@ -6,7 +6,7 @@ export async function GET(request) {
 
     // Perform a simple query to check the database connection
     const { data, error } = await supabase
-      .from("some_table")
+      .from("circles")
       .select("count (*)", { count: "exact" });
 
     if (error) {
