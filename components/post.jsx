@@ -10,19 +10,21 @@ import {
   ShareIcon,
   HeartIcon,
   FlagIcon,
+  UserPlusIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 
 import { TagPill, TagPillPlaceholder } from "./tag";
 
 import { ImagesViewer } from "./modals/viewer";
 
-import { updateLikeAction } from "@/lib/actions/post";
+import { updateLikeAction } from "@/libs/actions/post";
 
 import { timeSince } from "@/utils";
-import { UserPlusIcon } from "@heroicons/react/24/solid";
 
 export function PostTall({
   id,
+  viewCount,
   imagesSource,
   imagesAlternate,
   title,
@@ -47,6 +49,11 @@ export function PostTall({
           <p>{content}</p>
         </div>
         <div className="card-actions items-center">
+          {viewCount ? (
+            <span>
+              <EyeIcon className="size-5" /> {viewCount}
+            </span>
+          ) : null}
           <Link href={`/posts/${id}`} className="btn btn-primary">
             View
           </Link>
@@ -90,25 +97,36 @@ export function Post({
     if (ref.current) ref.current.showModal();
   };
   const handleLike = async () => {
-    if (!user) return router.push("/sign-in");
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
 
-    setLiked((like) => ({
-      active: !like.active,
-      count: like.active ? --like.count : ++like.count,
-    }));
-
-    const response = await updateLikeAction(id, likes, user);
-
-    if (response.error) {
-      setLiked((like) => ({
-        active: !like.active,
-        count: like.active ? --like.count : ++like.count,
+    try {
+      setLiked((prevLike) => ({
+        active: !prevLike.active,
+        count: prevLike.active ? prevLike.count - 1 : prevLike.count + 1,
       }));
-      return console.log(response);
+
+      const { error } = await updateLikeAction(id, likes, user);
+
+      if (error) {
+        throw new Error(error);
+      }
+    } catch (error) {
+      setLiked((prevLike) => ({
+        active: !prevLike.active,
+        count: prevLike.active ? prevLike.count - 1 : prevLike.count + 1,
+      }));
+      console.error("Error updating like:", error.message);
     }
   };
+
   const handleComment = () => {
-    if (!user) return router.push("/sign-in");
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
   };
   const handleShare = () => {};
 
@@ -153,11 +171,12 @@ export function Post({
               </div>
             </Link>
             <div className="flex items-center gap-2">
-              {!compact && (
-                <button className="btn btn-primary btn-sm rounded-xl md:btn-md">
-                  Follow
-                </button>
-              )}
+              {!compact &&
+                (user.id === writerID ? null : (
+                  <button className="btn btn-primary btn-sm rounded-xl md:btn-md">
+                    Follow
+                  </button>
+                ))}
               <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}
@@ -170,20 +189,32 @@ export function Post({
                   tabIndex={0}
                   className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
                 >
-                  {compact && (
+                  {user.id === writerID
+                    ? null
+                    : compact && (
+                        <li>
+                          <button>
+                            <UserPlusIcon className="size-5" />
+                            Follow
+                          </button>
+                        </li>
+                      )}
+                  {user.id === writerID ? (
                     <li>
-                      <button>
-                        <UserPlusIcon className="size-5" />
-                        Follow
+                      <button type="button" className="text-error">
+                        <TrashIcon className="size-5" />
+                        Delete this post
                       </button>
                     </li>
+                  ) : null}
+                  {user.id === writerID ? null : (
+                    <li>
+                      <a>
+                        <FlagIcon className="size-5" />
+                        Report this post
+                      </a>
+                    </li>
                   )}
-                  <li>
-                    <a>
-                      <FlagIcon className="size-5" />
-                      Report this post
-                    </a>
-                  </li>
                 </ul>
               </div>
             </div>
@@ -266,7 +297,7 @@ export function Post({
                   className={`size-5 ${comments?.some((comment) => comment.writer_id === user?.id) ? "fill-primary-content" : ""}`}
                 />
               </div>
-              <div className="btn btn-circle btn-primary btn-sm">
+              <div className="btn btn-circle btn-outline btn-primary btn-sm">
                 <ShareIcon className="size-5" />
               </div>
             </div>

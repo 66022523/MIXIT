@@ -1,7 +1,12 @@
 import { Section } from "@/components/section";
-import { EnvelopeIcon, KeyIcon, LockClosedIcon, ShieldCheckIcon } from "@heroicons/react/24/solid";
+import {
+  EnvelopeIcon,
+  KeyIcon,
+  LockClosedIcon,
+  ShieldCheckIcon,
+} from "@heroicons/react/24/solid";
 
-import config from "@/config"
+import config from "@/configs";
 
 export default function SecuritySettings() {
   return (

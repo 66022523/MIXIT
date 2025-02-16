@@ -2,14 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { StarIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
-import config from "@/config";
+import config from "@/configs";
 
 import { Section } from "@/components/section";
 
-import { getCircles } from "@/lib/queries/circles";
+import { getCircles } from "@/libs/queries/circles";
 
 export default async function Circles() {
-  const circles = await getCircles();
+  const { data: circlesData } = await getCircles();
 
   return (
     <>
@@ -46,7 +46,7 @@ export default async function Circles() {
       </div>
       <Section Icon={StarIcon} title="Recommended Communities" />
       <div className="grid grid-cols-4 gap-4">
-        {circles.map((circle, index) => (
+        {circlesData.map((circle, index) => (
           <Link
             className="card bg-base-100"
             href={`/circles/${circle.id}`}

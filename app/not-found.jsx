@@ -1,4 +1,3 @@
-"use client"
 import Link from "next/link";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { ArrowUturnLeftIcon } from "@heroicons/react/24/outline";

@@ -3,33 +3,33 @@ import { TagIcon } from "@heroicons/react/24/solid";
 import { Tag } from "@/components/tag";
 import { Section } from "@/components/section";
 
-import { getTags } from "@/lib/queries/tags";
+import { getTags } from "@/libs/queries/tags";
+import { Fragment } from "react";
 
 export default async function Tags() {
-  const tags = await getTags("id, name, posts(*)");
+  const { data: tagsData } = await getTags();
 
-  return tags ? (
+  return tagsData ? (
     <>
       <Section Icon={TagIcon} title="Tags" />
       <div className="card bg-base-100">
         <div className="card-body">
-          {tags?.length
-            ? tags.map((tag, index) => (
-                <>
+          {tagsData.posts?.length
+            ? tagsData.posts.map((tag, index) => (
+                <Fragment key={index}>
                   <Tag
                     id={tag.id}
                     name={tag.name}
                     postLength={tag.posts?.length || 0}
-                    key={index}
                   />
-                  {index !== tags.length - 1 && <div className="divider" />}
-                </>
+                  {index !== tagsData.length - 1 && <div className="divider" />}
+                </Fragment>
               ))
-            : ""}
+            : null}
         </div>
       </div>
     </>
   ) : (
-    ""
+    null
   );
 }

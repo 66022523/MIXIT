@@ -2,11 +2,11 @@ import { CommentTall } from "@/components/comments";
 import { PostTall } from "@/components/post";
 import { Empty } from "@/components/empty";
 
-export function UserTabLikes({ profile }) {
+export function UserTabLikes({ likes }) {
   return (
     <>
-      {profile.likes?.length ? (
-        profile.likes.map((like, index) =>
+      {likes?.length ? (
+        likes.map((like, index) =>
           like.post ? (
             <PostTall
               id={like.post.id}

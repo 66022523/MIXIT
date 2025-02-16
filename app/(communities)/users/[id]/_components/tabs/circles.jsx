@@ -1,11 +1,11 @@
 import { CircleTall } from "@/components/circle";
 import { Empty } from "@/components/empty";
 
-export function UserTabCircles({ profile }) {
+export function UserTabCircles({ circles }) {
   return (
     <>
-      {profile.circles?.length ? (
-        profile.circles.map((circle, index) => (
+      {circles?.length ? (
+        circles.map((circle, index) => (
           <CircleTall
             id={circle.id}
             coverURL={circle.cover_url}

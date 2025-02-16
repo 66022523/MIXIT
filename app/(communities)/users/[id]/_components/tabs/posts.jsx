@@ -1,11 +1,11 @@
 import { PostTall } from "@/components/post";
 import { Empty } from "@/components/empty";
 
-export function UserTabPosts({ profile }) {
+export function UserTabPosts({ posts }) {
   return (
     <>
-      {profile.posts?.length ? (
-        profile.posts.map((post, index) => (
+      {posts?.length ? (
+        posts.map((post, index) => (
           <PostTall
             id={post.id}
             imagesSource={post.images?.[0].source}

@@ -2,19 +2,19 @@ import { Bars3BottomLeftIcon } from "@heroicons/react/24/solid";
 import { Section } from "@/components/section";
 import { Placeholder } from "@/components/empty";
 import { Post, PostPlaceholder } from "@/components/post";
-import { getUser } from "@/lib/queries/auth";
-import { getPosts } from "@/lib/queries/posts";
+import { getUser } from "@/libs/queries/auth";
+import { getPosts } from "@/libs/queries/posts";
 
 export default async function Communities() {
   const { user } = await getUser();
-  const posts = await getPosts();
+  const { data: postsData } = await getPosts();
 
   return (
     <>
       <Section Icon={Bars3BottomLeftIcon} title="Posts" />
-      {posts?.length ? (
+      {postsData?.length ? (
         <div className="rounded-xl bg-base-100">
-          {posts.map((post, index) => (
+          {postsData.map((post, index) => (
             <Post
               user={user}
               id={post.id}
@@ -34,7 +34,8 @@ export default async function Communities() {
               circleID={post.circle?.id}
               circleIconURL={post.circle?.icon_url}
               circleName={post.circle?.name}
-              isEnded={index + 1 === posts.length}
+              isEnded={index + 1 === postsData.length}
+              isPreview={true}
               key={index}
             />
           ))}

@@ -9,8 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { InputContentEditor } from "@/components/editor";
 
-import { getCircles } from "@/lib/queries/circles";
-import { postAction } from "@/lib/actions/post";
+import { postAction } from "@/libs/actions/post";
 import { Section } from "@/components/section";
 
 export default function CreatePost() {
@@ -62,7 +61,7 @@ export default function CreatePost() {
 
   useEffect(() => {
     const fetchCircles = async () => {
-      const circles = await getCircles("id, name");
+      const circles = await getUserCircles("id, name");
       setCircles(circles);
     };
     fetchCircles();
@@ -104,9 +103,7 @@ export default function CreatePost() {
               onChange={(event) => setCircle(event.target.value)}
               disabled={isPending}
             >
-              <option disabled>
-                Select Community
-              </option>
+              <option disabled>Select Community</option>
               {circles.map((circle) => (
                 <option key={circle.id} value={circle.id}>
                   {circle.name}

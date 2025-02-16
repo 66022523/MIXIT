@@ -6,52 +6,61 @@ import { UserStats } from "./_components/stats";
 import { UserAchievement } from "./_components/achievement";
 import { UserTabs } from "./_components/tabs";
 
-import { getUser } from "@/lib/queries/auth";
-import { getProfile, getFollowing, getFollowers } from "@/lib/queries/users";
+import {
+  getUserProfile,
+  getUserCircles,
+  getUserComments,
+  getUserLikes,
+  getUserPosts,
+  getUserReports,
+  getUserViews,
+} from "@/libs/queries/users";
 
-export default async function Page({ params }) {
+import { createClient } from "@/utils/supabase/server";
+
+export default async function UserPage({ params }) {
   const { id } = await params;
-  const { user } = await getUser();
+  const supabase = await createClient();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+  const [
+    { data: userProfileData },
+    { data: userCirclesData },
+    { data: userCommentsData },
+    { data: userLikesData },
+    { data: userPostsData },
+    { data: userReportsData },
+    { data: userViewsData },
+  ] = await Promise.all([
+    getUserProfile(id),
+    getUserCircles(id),
+    getUserComments(id),
+    getUserLikes(id),
+    getUserPosts(id),
+    getUserReports(session, id),
+    getUserViews(session, id),
+  ]);
 
-  const profile = await getProfile(
-    id,
-    `
-      *,
-      circles (*),
-      posts (*),
-      comments (
-        *,
-        post:posts!comments_post_id_fkey(*))
-      ),
-      likes (
-        created_at,
-        post:posts!likes_post_id_fkey (*),
-        comment:comments!likes_comment_id_fkey (*)
-      ),
-      views (
-        created_at,
-        post:posts!views_post_id_fkey (*),
-        comment:comments!views_comment_id_fkey (*)
-      )
-    `,
-  );
-
-  if (!profile) notFound();
-
-  const following = await getFollowing(id, true);
-  const followers = await getFollowers(id, true);
+  if (!userProfileData) notFound();
 
   return (
     <>
-      <UserCover profile={profile} />
-      <UserDetail user={user} profile={profile} />
-      <UserStats
-        following={following}
-        followers={followers}
-        profile={profile}
+      <UserCover profile={userProfileData} />
+      <UserDetail user={session.user} profile={userProfileData} />
+      <UserStats profile={userProfileData} />
+      <UserAchievement profile={userProfileData} />
+      <UserTabs
+        user={session.user}
+        profile={userProfileData}
+        circles={userCirclesData}
+        comments={userCommentsData}
+        likes={userLikesData}
+        posts={userPostsData}
+        reports={userReportsData}
+        views={userViewsData}
       />
-      <UserAchievement profile={profile} />
-      <UserTabs user={user} profile={profile} />
     </>
   );
 }

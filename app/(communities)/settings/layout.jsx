@@ -8,9 +8,9 @@ import {
 
 import { ProfileProvider } from "@/contexts/profileContext";
 
-import config from "@/config";
+import config from "@/configs";
 
-import { getUser } from "@/lib/queries/auth";
+import { getUser } from "@/libs/queries/auth";
 
 export default async function SettingsLayout({ children }) {
   const { user } = await getUser();

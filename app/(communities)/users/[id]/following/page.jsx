@@ -6,21 +6,23 @@ import { Sidebar } from "@/components/layouts/sidebar";
 import { NotFound } from "@/components/empty";
 import { User } from "@/components/user";
 
-import { getProfile, getFollowing } from "@/lib/queries/users";
+import { getUserProfile, getUserFollowing } from "@/libs/queries/users";
 
 export default async function Following({ params }) {
   const { id } = await params;
-  const profile = await getProfile(id);
-  const following = await getFollowing(id, true);
+  const [{ data: profileData }, { data: followingData }] = await Promise.all([
+    getUserProfile(id),
+    getUserFollowing(id),
+  ]);
 
   return (
     <Sidebar>
       <div className="flex justify-between">
         <Section
-          backLink={`/users/${profile.id}`}
+          backLink={`/users/${profileData.id}`}
           Icon={UsersIcon}
-          title={`${profile.nickname} Following`}
-          description={`Users who ${profile.nickname} are following.`}
+          title={`${profileData.nickname} Following`}
+          description={`Users who ${profileData.nickname} are following.`}
         />
         <div className="items-center space-x-2">
           <div className="badge badge-lg gap-2 border-none pl-0">
@@ -28,7 +30,7 @@ export default async function Following({ params }) {
               {Intl.NumberFormat("en-US", {
                 notation: "compact",
                 maximumFractionDigits: 1,
-              }).format(following.length || 0)}
+              }).format(followingData.length || 0)}
             </div>
             Users
           </div>
@@ -52,8 +54,8 @@ export default async function Following({ params }) {
       </div>
       <div className="card bg-base-100">
         <div className="card-body">
-          {following?.length ? (
-            following?.map((user, index) => (
+          {followingData?.length ? (
+            followingData.map((user, index) => (
               <User
                 id={user.user.id}
                 avatarURL={user.user.avatar_url}
@@ -61,7 +63,7 @@ export default async function Following({ params }) {
                 role={user.user.role}
                 country={user.user.country}
                 signature={user.user.signature}
-                isEnded={index + 1 === following.length}
+                isEnded={index + 1 === followingData.length}
                 key={index}
               />
             ))
@@ -70,7 +72,7 @@ export default async function Following({ params }) {
               <div className="hero-content text-center">
                 <NotFound
                   iconCenter
-                  description={`${profile.nickname} hasn't followed anyone at the moment.`}
+                  description={`${profileData.nickname} hasn't followed anyone at the moment.`}
                 />
               </div>
             </div>

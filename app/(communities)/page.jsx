@@ -11,14 +11,16 @@ import { Placeholder } from "@/components/empty";
 import { Circle, CirclePlaceholder } from "@/components/circle";
 import { Post, PostPlaceholder } from "@/components/post";
 
-import { getUser } from "@/lib/queries/auth";
-import { getCircles } from "@/lib/queries/circles";
-import { getPosts } from "@/lib/queries/posts";
+import { getUser } from "@/libs/queries/auth";
+import { getCircles } from "@/libs/queries/circles";
+import { getPosts } from "@/libs/queries/posts";
 
 export default async function Communities() {
   const { user } = await getUser();
-  const circles = await getCircles();
-  const posts = await getPosts();
+  const [{ data: circlesData }, { data: postsData }] = await Promise.all([
+    getCircles(),
+    getPosts(),
+  ]);
 
   return (
     <div className="container mx-auto space-y-4 p-4 lg:space-y-12 lg:p-12">
@@ -33,7 +35,7 @@ export default async function Communities() {
           <div className="absolute bottom-0 left-0 h-1/4 w-1/4 rounded-bl-2xl rounded-tr-2xl bg-primary" />
           <div className="absolute bottom-0 left-0 h-2/4 w-2/5 rounded-bl-2xl rounded-tr-2xl bg-primary/30" />
           <div className="absolute bottom-0 left-0 h-3/4 w-2/4 rounded-bl-2xl rounded-tr-2xl bg-primary/10 backdrop-blur-md" />
-          <span className="absolute -right-1/4 top-1/4 text-8xl font-bold opacity-10 select-none">
+          <span className="absolute -right-1/4 top-1/4 select-none text-8xl font-bold opacity-10">
             COMMUNITY
           </span>
         </div>
@@ -58,9 +60,9 @@ export default async function Communities() {
             <ChevronRightIcon className="size-5 rounded-full bg-primary p-1 text-primary-content" />
           </Link>
         </div>
-        {circles?.length ? (
+        {circlesData.length ? (
           <div className="carousel carousel-center relative w-full space-x-4 rounded-box bg-base-100 p-4 hover:overflow-x-scroll">
-            {circles.map((circle, index) => (
+            {circlesData.map((circle, index) => (
               <div className="carousel-item" key={index}>
                 <Circle
                   id={circle.id}
@@ -86,9 +88,9 @@ export default async function Communities() {
           </Placeholder>
         )}
         <Section Icon={Bars3BottomLeftIcon} title="Posts" />
-        {posts?.length ? (
+        {postsData.length ? (
           <div className="rounded-2xl bg-base-100">
-            {posts.map((post, index) => (
+            {postsData.map((post, index) => (
               <Post
                 user={user}
                 id={post.id}
@@ -108,7 +110,7 @@ export default async function Communities() {
                 circleID={post.circle?.id}
                 circleIconURL={post.circle?.icon_url}
                 circleName={post.circle?.name}
-                isEnded={index + 1 === posts.length}
+                isEnded={index + 1 === postsData.length}
                 isPreview={true}
                 key={index}
               />
