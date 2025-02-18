@@ -1,25 +1,37 @@
 "use server";
 
-import configs from "@/configs";
+import { createClient } from "@/utils/supabase/server";
 
 export async function getCircles() {
-  const url = new URL("/api/circles", configs.base_url);
-  const response = await fetch(url.toString());
-  const data = await response.json();
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("circles").select();
 
-  if (!response.ok) return { data: [], error: data };
+  if (!data || error) return { data: null, error };
 
   return { data, error: null };
 }
 
 export async function getCircle(id) {
-  if (!id) return { data: [], error: "Please provide ID of circle." };
+  if (!id) return { data: null, error: "Please provide ID of circle." };
 
-  const url = new URL(`/api/circles/${id}`, configs.base_url);
-  const response = await fetch(url.toString());
-  const data = await response.json();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("circles")
+    .select(
+      `
+        *,
+        posts (
+          *,
+          circle:circles!posts_circle_id_fkey (*),
+          writer:users!posts_writer_id_fkey (*)
+        ),
+        member_count:users_circles (count)
+      `,
+    )
+    .eq("id", id)
+    .single();
 
-  if (!response.ok) return { data: [], error: data };
+  if (!data || error) return { data: null, error };
 
   return { data, error: null };
 }

@@ -11,8 +11,6 @@ import { HeaderNavbar } from "@/components/layouts/navbar/header";
 import { FooterNavbar } from "@/components/layouts/navbar/footer";
 import { Favicon } from "@/components/icons";
 
-import { getUserCircles, getUserProfile } from "@/libs/queries/users";
-
 import { createClient } from "@/utils/supabase/server";
 
 export default async function CommunitiesLayout({
@@ -23,17 +21,20 @@ export default async function CommunitiesLayout({
   const supabase = await createClient();
   const {
     data: { user },
-    error,
+    error: userError,
   } = await supabase.auth.getUser();
-  const [{ data: userProfileData }, { data: userCirclesData }] =
-    await Promise.all([getUserProfile(user?.id), getUserCircles(user?.id)]);
+  const { data, error } = await supabase
+    .from("users")
+    .select("*, circles (*)")
+    .eq("id", user?.id)
+    .single();
 
   return (
     <div className="drawer lg:drawer-open">
       <input id="drawer-side" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
         <header className="sticky left-0 top-0 z-50 w-full">
-          <HeaderNavbar user={user} profile={userProfileData} />
+          <HeaderNavbar user={user} profile={data} />
         </header>
         <main className="relative size-full overflow-clip rounded-none bg-base-300/80 lg:rounded-tl-2xl">
           <div className="size-full overflow-y-auto lg:absolute">
@@ -43,7 +44,7 @@ export default async function CommunitiesLayout({
           </div>
         </main>
         <footer className="sticky bottom-0 left-0 z-50 w-full lg:hidden">
-          <FooterNavbar />
+          <FooterNavbar user={user} />
         </footer>
       </div>
       <div className="overflow-invisible drawer-side z-50">
@@ -85,7 +86,7 @@ export default async function CommunitiesLayout({
               <div className="btn-disabled divider" />
             </li>
             {user &&
-              userCirclesData.map((circle, index) => (
+              data.circles.map((circle, index) => (
                 <li key={index}>
                   <Link
                     className="lg:btn-circle lg:mx-auto lg:mb-2"
