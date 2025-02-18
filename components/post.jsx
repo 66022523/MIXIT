@@ -172,7 +172,7 @@ export function Post({
             </Link>
             <div className="flex items-center gap-2">
               {!compact &&
-                (user.id === writerID ? null : (
+                (user?.id === writerID ? null : (
                   <button className="btn btn-primary btn-sm rounded-xl md:btn-md">
                     Follow
                   </button>
@@ -189,7 +189,7 @@ export function Post({
                   tabIndex={0}
                   className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
                 >
-                  {user.id === writerID
+                  {user?.id === writerID
                     ? null
                     : compact && (
                         <li>
@@ -199,7 +199,7 @@ export function Post({
                           </button>
                         </li>
                       )}
-                  {user.id === writerID ? (
+                  {user?.id === writerID ? (
                     <li>
                       <button type="button" className="text-error">
                         <TrashIcon className="size-5" />
@@ -207,7 +207,7 @@ export function Post({
                       </button>
                     </li>
                   ) : null}
-                  {user.id === writerID ? null : (
+                  {user?.id === writerID ? null : (
                     <li>
                       <a>
                         <FlagIcon className="size-5" />
