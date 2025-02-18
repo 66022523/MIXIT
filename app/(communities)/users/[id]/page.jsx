@@ -50,9 +50,9 @@ export default async function UserPage({ params }) {
   const { id } = await params;
   const supabase = await createClient();
   const {
-    data: { session },
+    data: { user },
     error,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
   const [
     { data: userProfileData },
     { data: userCirclesData },
@@ -67,8 +67,8 @@ export default async function UserPage({ params }) {
     getUserComments(id),
     getUserLikes(id),
     getUserPosts(id),
-    getUserReports(session, id),
-    getUserViews(session, id),
+    getUserReports(id, user),
+    getUserViews(id, user),
   ]);
 
   if (!userProfileData) notFound();
@@ -76,11 +76,11 @@ export default async function UserPage({ params }) {
   return (
     <>
       <UserCover profile={userProfileData} />
-      <UserDetail user={session.user} profile={userProfileData} />
+      <UserDetail user={user} profile={userProfileData} />
       <UserStats profile={userProfileData} />
       <UserAchievement profile={userProfileData} />
       <UserTabs
-        user={session.user}
+        user={user}
         profile={userProfileData}
         circles={userCirclesData}
         comments={userCommentsData}

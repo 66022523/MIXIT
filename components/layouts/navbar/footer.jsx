@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,27 +10,8 @@ import {
   FireIcon,
 } from "@heroicons/react/24/outline";
 
-import { createClient } from "@/utils/supabase/client";
-
-export function FooterNavbar() {
+export function FooterNavbar({ user }) {
   const pathname = usePathname();
-  const [session, setSession] = useState();
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   return (
     <div className="btm-nav relative bg-base-100/80 backdrop-blur-3xl">
@@ -54,7 +34,7 @@ export function FooterNavbar() {
         <BellIcon className="size-5" />
       </button>
       <Link
-        href={session ? `/users/${session.user.id}` : "/sign-in"}
+        href={user ? `/users/${user.id}` : "/sign-in"}
         className={`${pathname === "/users/[id]" ? "active text-primary" : ""} bg-opacity-50`}
       >
         <UserIcon className="size-5" />
