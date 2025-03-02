@@ -61,7 +61,7 @@ export default function EditorPostForm({
     if (![100, 200].includes(state.status)) {
       console.error(state.message);
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <>

@@ -24,7 +24,7 @@ export default function DeletePostForm({ user, postData, isModal }) {
     if (![100, 200].includes(state.status)) {
       console.error(state);
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <>
