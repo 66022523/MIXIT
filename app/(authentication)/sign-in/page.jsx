@@ -1,4 +1,4 @@
-import { SignIn } from "@/components/modals/authentication/signIn";
+import { SignIn } from "@/components/forms/authentication/signIn";
 
 export default function Page() {
   return <SignIn />;
