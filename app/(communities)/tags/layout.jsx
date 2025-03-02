@@ -1,11 +1,11 @@
-import { SidePosts } from "@/components/layouts/sidebar";
+import { Sidebar } from "@/components/layouts/sidebar";
 
-export default function Layout({ children }) {
+export default async function Layout({ children }) {
   return (
     <div className="container mx-auto space-y-4 p-4 lg:space-y-12 lg:p-12">
-      <SidePosts>
+      <Sidebar>
         {children}
-      </SidePosts>
+      </Sidebar>
     </div>
   );
 }
