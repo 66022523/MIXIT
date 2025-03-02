@@ -1,127 +1,107 @@
-import Image from "next/image";
-import {
-  ChatBubbleBottomCenterIcon,
-  EyeIcon,
-  HeartIcon,
-  ShareIcon,
-} from "@heroicons/react/24/outline";
+import { ChatBubbleLeftEllipsisIcon } from "@heroicons/react/24/solid";
 
+import { Section } from "@/components/section";
+import { Comment } from "@/components/comments";
 import { Placeholder } from "@/components/empty";
 import { Post, PostPlaceholder } from "@/components/post";
+import CreateCommentForm from "@/components/forms/comments/create";
 
-import { getUser } from "@/libs/queries/auth";
-import { getPost } from "@/libs/queries/posts";
+import { getPost, getPostComments } from "@/libs/queries/posts";
+import {
+  getUserComments,
+  getUserFollowing,
+  getUserLikes,
+  getUserProfile,
+  getUserViews,
+} from "@/libs/queries/users";
+
+import { createClient } from "@/utils/supabase/server";
 
 export default async function PostDetail({ params }) {
   const { id } = await params;
-  const { user } = await getUser();
-  const { data: postData, error } = await getPost(id);
 
-  if (error) console.error(error);
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [
+    { error: viewError },
+    { data: postData },
+    { data: postCommentsData },
+    { data: userProfileData },
+    { data: userViewsData },
+    { data: userLikesData },
+    { data: userCommentsData },
+    { data: userFollowingData },
+  ] = await Promise.all([
+    supabase
+      .from("views")
+      .insert(user ? { user_id: user.id, post_id: id } : { post_id: id }),
+    getPost(id),
+    getPostComments(id),
+    getUserProfile(user?.id),
+    getUserViews(user?.id, user),
+    getUserLikes(user?.id),
+    getUserComments(user?.id),
+    getUserFollowing(user?.id),
+  ]);
+
+  const commentFilter = [
+    "All Comments",
+    "Most Views",
+    "Most Likes",
+    "Most Comments",
+    "Most Shares",
+    "Newest",
+    "Oldest",
+  ];
 
   return (
     <>
-      {postData && !error ? (
-        <div className="space-y-4 rounded-2xl bg-base-100 pb-4">
-          <Post
-            user={user}
-            id={postData.id}
-            createdAt={postData.created_at}
-            title={postData.title}
-            content={postData.content}
-            tags={postData.tags}
-            images={postData.images}
-            view={postData.views}
-            likes={postData.likes}
-            comments={postData.comments}
-            shares={postData.shares}
-            writerID={postData.writer?.id}
-            writerAvatarURL={postData.writer?.avatar_url}
-            writerNickname={postData.writer?.nickname}
-            writerRole={postData.writer?.role}
-            circleID={postData.circle?.id}
-            circleIconURL={postData.circle?.icon_url}
-            circleName={postData.circle?.name}
-            isEnded={true}
-          />
-
-          <div role="tablist" className="tabs-boxed tabs mx-8">
-            {[
-              "All Comments",
-              "Most Views",
-              "Most Likes",
-              "Most Comments",
-              "Most Shares",
-              "Newest",
-              "Oldest",
-            ].map((option) => (
-              <a
-                role="tab"
-                className={option === "All Comments" ? "tab tab-active" : "tab"}
-                key={option}
-              >
-                {option}
-              </a>
-            ))}
-          </div>
-
-          <div className="space-y-4 px-8 pb-4">
-            {postData?.comments?.length > 0 ? (
-              postData?.comments?.map((comment, index) => (
-                <div key={index} className="card bg-base-200 p-4">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="avatar">
-                        <div className="h-12 w-12 rounded-full bg-neutral text-neutral-content">
-                          {comment.writer.avatar_url ? (
-                            <Image
-                              alt={comment.writer.nickname}
-                              src={comment.writer.avatar_url}
-                              width={48}
-                              height={48}
-                            />
-                          ) : (
-                            <span className="text-lg font-bold">
-                              {comment.writer.nickname?.charAt(0)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="text-text font-bold">
-                          {comment.writer.nickname}
-                        </h4>
-                        <p className="text-text text-sm">
-                          {new Date(comment.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <button className="btn btn-primary btn-sm">Follow</button>
-                  </div>
-                  <p className="text-text mb-4">{comment.content}</p>
-                  <div className="text-text flex items-center space-x-6">
-                    <div className="flex items-center text-sm">
-                      <EyeIcon className="mr-2 h-5 w-5" />
-                      {comment.views || 0}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <HeartIcon className="mr-2 h-5 w-5" />
-                      {comment.likes || 0}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <ChatBubbleBottomCenterIcon className="mr-2 h-5 w-5" />
-                      {comment.replies || 0}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <ShareIcon className="mr-2 h-5 w-5" />
-                      {comment.shares || 0}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-text">No comments yet...</p>
-            )}
+      {postData ? (
+        <div className="card bg-base-100">
+          <div className="card-body space-y-4">
+            <Post
+              user={user}
+              postData={postData}
+              userViewsData={userViewsData}
+              userLikesData={userLikesData}
+              userCommentsData={userCommentsData}
+              userFollowingData={userFollowingData}
+              showCount
+              isEnded={true}
+            />
+            <Section
+              Icon={ChatBubbleLeftEllipsisIcon}
+              title="Comments"
+              description="Join the conversation and share your thoughts."
+              id="comments"
+            />
+            <div className="space-y-4">
+              <CreateCommentForm
+                user={user}
+                profile={userProfileData}
+                circleID={postData.circle.id}
+                postID={postData.id}
+              />
+              {postCommentsData?.length
+                ? postCommentsData.map((comment, index) => (
+                    <Comment
+                      user={user}
+                      postID={id}
+                      commentData={comment}
+                      userViewsData={userViewsData}
+                      userLikesData={userLikesData}
+                      userCommentsData={userCommentsData}
+                      userFollowingData={userFollowingData}
+                      isPreview
+                      isParent
+                      key={index}
+                    />
+                  ))
+                : !user && <p>No comments yet...</p>}
+            </div>
           </div>
         </div>
       ) : (

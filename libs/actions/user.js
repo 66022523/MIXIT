@@ -1,4 +1,5 @@
 "use server";
+
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/utils/supabase/server";
@@ -74,4 +75,69 @@ export const updateProfileAction = async (formData) => {
   revalidatePath("/", "layout");
 
   return { type: "success", message: "" };
+};
+
+export const followAction = async (user, id, previousState, formData) => {
+  if (!user)
+    return {
+      status: 401,
+      message: "Please log in first.",
+    };
+  if (!id)
+    return {
+      status: 400,
+      message: "Please provide user ID.",
+    };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("followers")
+    .insert({ user_id: user?.id, follower_id: id });
+
+  if (error)
+    return {
+      status: 500,
+      message: error.message,
+    };
+  
+  revalidatePath("/")
+  revalidatePath("/posts")
+
+  return {
+    status: 200,
+    message: "Success to follow user.",
+  };
+};
+
+export const unfollowAction = async (user, id, previousState, formData) => {
+  if (!user)
+    return {
+      status: 401,
+      message: "Please log in first.",
+    };
+  if (!id)
+    return {
+      status: 400,
+      message: "Please provide user ID.",
+    };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("followers")
+    .delete()
+    .eq("user_id", user?.id)
+    .eq("follower_id", id);
+
+  if (error)
+    return {
+      status: 500,
+      message: error.message,
+    };
+    
+  revalidatePath("/posts")
+
+  return {
+    status: 200,
+    message: "Success to unfollow user.",
+  };
 };

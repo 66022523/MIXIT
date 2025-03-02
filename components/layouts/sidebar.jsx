@@ -1,4 +1,5 @@
 "use server";
+
 import Link from "next/link";
 import { Fragment } from "react";
 import { Bars3BottomLeftIcon, FireIcon } from "@heroicons/react/24/solid";
@@ -9,10 +10,9 @@ import { Tag, TagPlaceholder } from "@/components/tag";
 import { Footer } from "@/components/layouts/footer";
 import { Placeholder } from "@/components/empty";
 
-import { getUser } from "@/libs/queries/auth";
 import { getCircles } from "@/libs/queries/circles";
-import { getPosts } from "@/libs/queries/posts";
 import { getTags } from "@/libs/queries/tags";
+import { Section } from "../section";
 
 export async function Sidebar({ className, children }) {
   const [{ data: circlesData }, { data: tagsData }] = await Promise.all([
@@ -140,10 +140,16 @@ export async function Sidebar({ className, children }) {
   );
 }
 
-export async function SidePosts({ className, children }) {
-  const { user } = await getUser();
-  const { data: postsData } = await getPosts();
-
+export async function SidePosts({
+  user,
+  postsData,
+  userViewsData,
+  userLikesData,
+  userCommentsData,
+  userFollowingData,
+  className,
+  children,
+}) {
   return (
     <div
       className={`grid min-h-screen grid-cols-4 gap-12 lg:flex-nowrap ${className}`}
@@ -153,43 +159,38 @@ export async function SidePosts({ className, children }) {
       </div>
       <aside className="sticky bottom-0 col-span-4 space-y-4 lg:col-span-1 lg:space-y-12">
         <div className="card bg-base-100">
-          <h2 className="card-title px-8 pt-8">
-            <Bars3BottomLeftIcon className="size-8 rounded-full bg-secondary p-1 text-error-content" />
-            Similar Posts
-          </h2>
-          {postsData.length ? (
+          <Section
+            sectionClass="flex items-center justify-between gap-2 px-4 pt-4"
+            Icon={Bars3BottomLeftIcon}
+            iconClass="size-8 rounded-full bg-secondary p-1 text-error-content"
+            title="Similar Posts"
+          />
+          {postsData?.length ? (
             postsData.map((post, index) => (
-              <Post
-                user={user}
-                id={post.id}
-                createdAt={post.created_at}
-                title={post.title}
-                content={post.content}
-                tags={post.tags}
-                images={post.images}
-                view={post.views}
-                likes={post.likes}
-                comments={post.comments}
-                shares={post.shares}
-                writerID={post.writer?.id}
-                writerAvatarURL={post.writer?.avatar_url}
-                writerNickname={post.writer?.nickname}
-                writerRole={post.writer?.role}
-                circleID={post.circle?.id}
-                circleIconURL={post.circle?.icon_url}
-                circleName={post.circle?.name}
-                isEnded={index + 1 === postsData.length}
-                isPreview={true}
-                compact={true}
-                key={index}
-              />
+              <Fragment key={index}>
+                <div className="card card-compact">
+                  <div className="card-body">
+                    <Post
+                      user={user}
+                      postData={post}
+                      userViewsData={userViewsData}
+                      userLikesData={userLikesData}
+                      userCommentsData={userCommentsData}
+                      userFollowingData={userFollowingData}
+                      isPreview
+                      isCompact
+                    />
+                  </div>
+                </div>
+                {index + 1 !== postsData.length && <div className="divider" />}
+              </Fragment>
             ))
           ) : (
             <Placeholder
               title="Empty Posts"
               description="There are currently no posts."
             >
-              <PostPlaceholder isEnded={true} />
+              <PostPlaceholder isEnded />
             </Placeholder>
           )}
         </div>

@@ -9,13 +9,13 @@ import { Fragment } from "react";
 export default async function Tags() {
   const { data: tagsData } = await getTags();
 
-  return tagsData ? (
+  return (
     <>
       <Section Icon={TagIcon} title="Tags" />
       <div className="card bg-base-100">
         <div className="card-body">
-          {tagsData.posts?.length
-            ? tagsData.posts.map((tag, index) => (
+          {tagsData?.length
+            ? tagsData.map((tag, index) => (
                 <Fragment key={index}>
                   <Tag
                     id={tag.id}
@@ -29,7 +29,5 @@ export default async function Tags() {
         </div>
       </div>
     </>
-  ) : (
-    null
   );
 }

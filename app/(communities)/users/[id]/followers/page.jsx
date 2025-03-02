@@ -17,41 +17,38 @@ export default async function Followers({ params }) {
 
   return (
     <Sidebar>
-      <div className="flex justify-between">
-        <Section
-          backLink={`/users/${profileData.id}`}
-          Icon={UserGroupIcon}
-          title={`${profileData.nickname} Followers`}
-          description={`All users who are following ${profileData.nickname}.`}
-        />
-        <div className="items-center space-x-2">
-          <div className="badge badge-lg gap-2 border-none pl-0">
-            <div className="badge badge-primary badge-lg gap-2">
-              {Intl.NumberFormat("en-US", {
-                notation: "compact",
-                maximumFractionDigits: 1,
-              }).format(followersData.length || 0)}
-            </div>
-            Users
+      <Section
+        backLink={`/users/${profileData.id}`}
+        Icon={UserGroupIcon}
+        title={`${profileData.nickname} Followers`}
+        description={`All users who are following ${profileData.nickname}.`}
+      >
+        <div className="badge badge-lg gap-2 border-none pl-0">
+          <div className="badge badge-primary badge-lg gap-2">
+            {Intl.NumberFormat("en-US", {
+              notation: "compact",
+              maximumFractionDigits: 1,
+            }).format(followersData?.length || 0)}
           </div>
-          <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-circle">
-              <FunnelIcon className="size-5" />
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
-            >
-              <li>
-                <a>Item 1</a>
-              </li>
-              <li>
-                <a>Item 2</a>
-              </li>
-            </ul>
-          </div>
+          Users
         </div>
-      </div>
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-circle">
+            <FunnelIcon className="size-5" />
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
+          >
+            <li>
+              <a>Item 1</a>
+            </li>
+            <li>
+              <a>Item 2</a>
+            </li>
+          </ul>
+        </div>
+      </Section>
       <div className="card bg-base-100">
         <div className="card-body">
           {followersData?.length ? (

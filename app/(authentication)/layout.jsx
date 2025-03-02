@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Social } from "@/components/modals/authentication/social";
+import { Social } from "@/components/forms/authentication/social";
 
 import configs from "@/configs";
 

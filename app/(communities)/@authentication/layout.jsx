@@ -7,7 +7,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 
-import { Social } from "@/components/modals/authentication/social";
+import { Social } from "@/components/forms/authentication/social";
 
 import configs from "@/configs";
 

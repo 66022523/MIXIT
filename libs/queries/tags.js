@@ -29,7 +29,6 @@ export async function getTag(id) {
           nsfw,
           title,
           content,
-          history,
           tags (*),
           images,
           views (user:users!views_user_id_fkey (*)),

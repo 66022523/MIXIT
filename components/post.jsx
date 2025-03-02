@@ -1,60 +1,70 @@
 "use client";
-import { useRef, useState } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRef } from "react";
 import {
   EllipsisVerticalIcon,
-  ChatBubbleBottomCenterIcon,
-  EyeIcon,
-  ShareIcon,
-  HeartIcon,
+  EyeIcon as EyeOutlineIcon,
   FlagIcon,
-  UserPlusIcon,
+  PencilIcon,
+  PhotoIcon,
   TrashIcon,
+  UserMinusIcon,
+  UserPlusIcon,
 } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
-import { TagPill, TagPillPlaceholder } from "./tag";
-
+import ViewButton from "./buttons/view";
+import LikeButton from "./buttons/like";
+import CommentButton from "./buttons/comment";
+import ShareButton from "./buttons/share";
+import { Avatar } from "./user";
+import { FollowButton, UnfollowButton } from "./buttons/follow";
 import { ImagesViewer } from "./modals/viewer";
-
-import { updateLikeAction } from "@/libs/actions/post";
+import { TagPill, TagPillPlaceholder } from "./tag";
 
 import { timeSince } from "@/utils";
 
-export function PostTall({
-  id,
-  viewCount,
-  imagesSource,
-  imagesAlternate,
-  title,
-  content,
-}) {
+export function PostTall({ cardClassName, postData, showCount, disabled }) {
   return (
-    <div className="card flex-row bg-base-200">
-      {imagesSource && (
-        <figure className="py-5 pl-5">
+    <div
+      className={`card card-compact bg-base-200 lg:card-side ${cardClassName}`}
+    >
+      {postData.images && (
+        <figure className="py-4 pl-4">
           <Image
             className="rounded-xl"
-            src={imagesSource}
-            alt={imagesAlternate}
+            src={postData.images[0].source}
+            alt={postData.images[0].alternate}
             width={100}
             height={100}
           />
         </figure>
       )}
-      <div className="card-body flex-row p-5">
-        <div className="flex-1">
-          <h2 className="card-title">{title}</h2>
-          <p>{content}</p>
+      <div className="card-body flex-row items-center justify-between">
+        <div className="line-clamp-2">
+          <h2 className="font-bold">{postData.title}</h2>
+          <div
+            className="whitespace-break-spaces break-all"
+            dangerouslySetInnerHTML={{ __html: postData.content }}
+          />
         </div>
-        <div className="card-actions items-center">
-          {viewCount ? (
-            <span>
-              <EyeIcon className="size-5" /> {viewCount}
+        <div className="card-actions items-center gap-2">
+          {showCount ? (
+            <span className="flex items-center gap-2">
+              <EyeOutlineIcon className="size-5" />
+              {Intl.NumberFormat("en-US", {
+                notation: "compact",
+                maximumFractionDigits: 1,
+              }).format(postData.view_count || 0)}
             </span>
           ) : null}
-          <Link href={`/posts/${id}`} className="btn btn-primary">
+          <Link
+            href={`/posts/${postData.id}`}
+            className="btn btn-primary"
+            disabled={disabled}
+          >
             View
           </Link>
         </div>
@@ -65,201 +75,232 @@ export function PostTall({
 
 export function Post({
   user,
-  id,
-  createdAt,
-  title,
-  content,
-  tags,
-  images,
-  views,
-  likes,
-  comments,
-  shares,
-  writerID,
-  writerAvatarURL,
-  writerNickname,
-  writerRole,
-  circleID,
-  circleIconURL,
-  circleName,
-  isEnded,
+  postData,
+  userViewsData,
+  userLikesData,
+  userCommentsData,
+  userFollowingData,
+  sharePath,
+  shareFacebookHashtag,
+  shareXHashtags,
+  showCount,
   isPreview,
-  compact,
+  isCompact,
 }) {
   const ref = useRef();
-  const router = useRouter();
-  const [liked, setLiked] = useState({
-    active: likes?.some((like) => like.user?.id === user?.id),
-    count: likes?.length || 0,
-  });
+
+  const hasViewed = userViewsData?.some(
+    (view) => view.post?.id === postData.id,
+  );
+  const hasLiked = userLikesData?.some((like) => like.post?.id === postData.id);
+  const hasCommented = userCommentsData?.some(
+    (comment) => comment.post?.id === postData.id,
+  );
+  const hasFollowedWriter = userFollowingData?.some(
+    (follow) => follow.user.id === postData.writer?.id,
+  );
 
   const handleShowImagesViewer = () => {
     if (ref.current) ref.current.showModal();
   };
-  const handleLike = async () => {
-    if (!user) {
-      router.push("/sign-in");
-      return;
-    }
-
-    try {
-      setLiked((prevLike) => ({
-        active: !prevLike.active,
-        count: prevLike.active ? prevLike.count - 1 : prevLike.count + 1,
-      }));
-
-      const { error } = await updateLikeAction(id, likes, user);
-
-      if (error) {
-        throw new Error(error);
-      }
-    } catch (error) {
-      setLiked((prevLike) => ({
-        active: !prevLike.active,
-        count: prevLike.active ? prevLike.count - 1 : prevLike.count + 1,
-      }));
-      console.error("Error updating like:", error.message);
-    }
-  };
-
-  const handleComment = () => {
-    if (!user) {
-      router.push("/sign-in");
-      return;
-    }
-  };
-  const handleShare = () => {};
 
   return (
     <>
-      <div className="card">
-        <div className="card-body space-y-4">
-          <div className="flex justify-between">
-            <Link
-              href={`/users/${writerID}`}
-              className="flex items-center gap-2"
+      <div className="flex justify-between">
+        <Link
+          href={`/users/${postData.writer.id}`}
+          className="flex items-center gap-2"
+        >
+          <Avatar
+            avatarURL={postData.writer.avatar_url}
+            nickname={postData.writer.nickname}
+          />
+          <div>
+            <h4
+              className={`line-clamp-2 font-bold ${postData.writer.role?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
             >
-              <div className={`avatar ${writerAvatarURL ? "" : "placeholder"}`}>
-                <div
-                  className={`size-12 rounded-full ${writerAvatarURL ? "" : "bg-neutral text-neutral-content"}`}
+              {postData.writer.nickname}
+            </h4>
+            <time
+              className="text-sm"
+              dateTime={new Date(postData.created_at).toISOString()}
+              suppressHydrationWarning
+            >
+              {timeSince(postData.created_at)}
+            </time>
+          </div>
+        </Link>
+        <div className="flex items-center gap-2">
+          {!isCompact ? (
+            user ? (
+              user.id !== postData.writer.id ? (
+                !hasFollowedWriter && (
+                  <FollowButton
+                    user={user}
+                    followID={postData.writer.id}
+                    buttonClass="btn btn-primary btn-sm rounded-xl md:btn-md"
+                  />
+                )
+              ) : (
+                <Link
+                  href={`/posts/${postData.id}/edit`}
+                  className="btn btn-primary btn-sm rounded-xl md:btn-md"
                 >
-                  {writerAvatarURL ? (
-                    <Image
-                      alt={writerNickname}
-                      src={writerAvatarURL}
-                      width={48}
-                      height={48}
-                    />
-                  ) : (
-                    <span>{writerNickname?.charAt(0)}</span>
-                  )}
-                </div>
-              </div>
-              <div>
-                <h4
-                  className={`font-bold ${writerRole?.toLowerCase() === "admin" ? "text-secondary" : ""}`}
-                >
-                  {writerNickname}
-                </h4>
-                <time
-                  className="text-sm"
-                  dateTime={new Date(createdAt).toISOString()}
-                  suppressHydrationWarning
-                >
-                  {timeSince(createdAt)}
-                </time>
-              </div>
-            </Link>
-            <div className="flex items-center gap-2">
-              {!compact &&
-                (user?.id === writerID ? null : (
-                  <button className="btn btn-primary btn-sm rounded-xl md:btn-md">
-                    Follow
-                  </button>
-                ))}
-              <div className="dropdown dropdown-end">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className={`btn btn-circle btn-primary btn-sm ${compact ? "" : "md:btn-md"}`}
-                >
-                  <EllipsisVerticalIcon className="size-5" />
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
-                >
-                  {user?.id === writerID
-                    ? null
-                    : compact && (
-                        <li>
-                          <button>
-                            <UserPlusIcon className="size-5" />
-                            Follow
-                          </button>
-                        </li>
-                      )}
-                  {user?.id === writerID ? (
-                    <li>
-                      <button type="button" className="text-error">
-                        <TrashIcon className="size-5" />
-                        Delete this post
-                      </button>
-                    </li>
-                  ) : null}
-                  {user?.id === writerID ? null : (
-                    <li>
-                      <a>
-                        <FlagIcon className="size-5" />
-                        Report this post
-                      </a>
-                    </li>
-                  )}
-                </ul>
-              </div>
+                  Edit
+                </Link>
+              )
+            ) : (
+              <Link
+                href="/sign-in"
+                className="btn btn-primary btn-sm rounded-xl md:btn-md"
+              >
+                Follow
+              </Link>
+            )
+          ) : null}
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className={`btn btn-circle btn-primary btn-sm ${isCompact ? "" : "md:btn-md"}`}
+            >
+              <EllipsisVerticalIcon className="size-5" />
             </div>
+            <ul
+              tabIndex={0}
+              className="menu dropdown-content z-[1] mt-1 w-52 rounded-box bg-base-200 p-2 shadow"
+            >
+              {isCompact ? (
+                user ? (
+                  user.id !== postData.writer.id ? (
+                    !hasFollowedWriter && (
+                      <li>
+                        <FollowButton
+                          user={user}
+                          followID={postData.writer.id}
+                          buttonClass="inline-flex gap-2"
+                          label={
+                            <>
+                              <UserPlusIcon className="size-5" />
+                              Follow this user
+                            </>
+                          }
+                        />
+                      </li>
+                    )
+                  ) : (
+                    <li>
+                      <Link href={`/posts/${postData.id}/edit`}>
+                        <PencilIcon className="size-5" />
+                        Edit this post
+                      </Link>
+                    </li>
+                  )
+                ) : (
+                  <li>
+                    <Link href="/sign-in">
+                      <UserPlusIcon className="size-5" />
+                      Follow this user
+                    </Link>
+                  </li>
+                )
+              ) : null}
+              {user?.id !== postData.writer.id
+                ? hasFollowedWriter && (
+                    <li>
+                      <UnfollowButton
+                        user={user}
+                        followID={postData.writer.id}
+                        buttonClass="inline-flex gap-2"
+                        label={
+                          <>
+                            <UserMinusIcon className="size-5" />
+                            Unfollow this user
+                          </>
+                        }
+                      />
+                    </li>
+                  )
+                : null}
+              {user?.id === postData.writer.id ? (
+                <li>
+                  <Link
+                    href={`/posts/${postData.id}/delete`}
+                    className="text-error"
+                  >
+                    <TrashIcon className="size-5" />
+                    Delete this post
+                  </Link>
+                </li>
+              ) : null}
+              {user?.id !== postData.writer.id ? (
+                <li>
+                  <button type="button">
+                    <FlagIcon className="size-5" />
+                    Report this post
+                  </button>
+                </li>
+              ) : null}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {isPreview ? (
+        <Link href={`/posts/${postData.id}`}>
+          <h1 className="card-title text-2xl">{postData.title}</h1>
+          <div
+            className={isCompact ? "line-clamp-2" : "line-clamp-6"}
+            dangerouslySetInnerHTML={{ __html: postData.content }}
+          />
+        </Link>
+      ) : (
+        <div>
+          <h1 className="card-title text-2xl">{postData.title}</h1>
+          <div dangerouslySetInnerHTML={{ __html: postData.content }} />
+        </div>
+      )}
+      {postData.circle_id || postData.tags?.length ? (
+        <div className="flex flex-wrap gap-2">
+          {postData.circle_id && (
+            <TagPill
+              isHeader={true}
+              iconURL={postData.circle.icon_url}
+              name={postData.circle.name}
+              url={`/circles/${postData.circle_id}`}
+            />
+          )}
+          {postData.tags?.map((tag, index) => (
+            <TagPill name={tag.name} url={`/tags/${tag.id}`} key={index} />
+          ))}
+        </div>
+      ) : null}
+      {postData.images ? (
+        <>
+          <div className="badge badge-ghost badge-lg w-full gap-2">
+            <PhotoIcon className="size-5" />
+            {Intl.NumberFormat("en-US", {
+              notation: "compact",
+              maximumFractionDigits: 1,
+            }).format(postData.images.length)}{" "}
+            Photos
           </div>
           {isPreview ? (
-            <Link href={`/posts/${id}`}>
-              <h1 className="card-title text-2xl">{title}</h1>
-              <div
-                className={compact ? "line-clamp-2" : "line-clamp-6"}
-                dangerouslySetInnerHTML={{ __html: content }}
-              />
-            </Link>
-          ) : (
-            <div>
-              <h1 className="card-title text-2xl">{title}</h1>
-              <div dangerouslySetInnerHTML={{ __html: content }} />
-            </div>
-          )}
-          {circleID || tags?.length ? (
-            <div className="flex flex-wrap gap-2">
-              {circleID && (
-                <TagPill
-                  isHeader={true}
-                  iconURL={circleIconURL}
-                  name={circleName}
-                  url={`/circles/${circleID}`}
-                />
-              )}
-              {tags?.map((tag, index) => (
-                <TagPill name={tag.name} url={`/tags/${tag.id}`} key={index} />
-              ))}
-            </div>
-          ) : null}
-          {images && (
             <>
-              <div className="columns-3xs gap-4 space-y-4">
-                {images.map(
+              <div
+                className={`${isCompact ? "grid grid-cols-2" : "columns-3xs space-y-4"} gap-4`}
+              >
+                {postData.images.map(
                   (image, index) =>
-                    index < (compact ? 2 : 4) && (
+                    index < (isCompact ? 2 : 4) && (
                       <div onClick={handleShowImagesViewer} key={index}>
-                        <Link href={`/#post-${id}-image-${index + 1}`}>
+                        <Link href={`/#post-${postData.id}-image-${index + 1}`}>
                           <Image
-                            className={`${index === 0 || index === 3 ? "aspect-video" : "aspect-square"} w-full rounded-box object-cover`}
+                            className={`${isCompact ? "aspect-square" : index === 0 || index === 3 ? "aspect-video" : "aspect-square"} w-full rounded-box object-cover`}
                             src={image.source}
-                            alt={image.alternate}
+                            alt={
+                              image.alternate ||
+                              `Preview post image ${index + 1}`
+                            }
                             width={1280}
                             height={720}
                           />
@@ -270,95 +311,107 @@ export function Post({
               </div>
               <ImagesViewer
                 className="!mt-0"
-                id={`post-${id}`}
-                images={images}
+                id={`post-${postData.id}`}
+                images={postData.images}
                 ref={ref}
               />
             </>
-          )}
-          {compact ? (
-            <div className="flex gap-2">
-              <div className="btn btn-disabled btn-circle btn-primary btn-sm">
-                <EyeIcon
-                  className={`size-5 ${views?.some((view) => view.user.id === user?.id) ? "fill-current" : ""}`}
-                />
-              </div>
-              <div
-                className={`btn btn-circle btn-error btn-sm ${liked.active ? "btn-active" : "btn-outline"}`}
-              >
-                <HeartIcon
-                  className={`size-5 ${liked.active ? "fill-error-content" : ""}`}
-                />
-              </div>
-              <div
-                className={`btn btn-circle btn-primary btn-sm ${comments?.some((comment) => comment.writer_id === user?.id) ? "btn-active" : "btn-outline"}`}
-              >
-                <ChatBubbleBottomCenterIcon
-                  className={`size-5 ${comments?.some((comment) => comment.writer_id === user?.id) ? "fill-primary-content" : ""}`}
-                />
-              </div>
-              <div className="btn btn-circle btn-outline btn-primary btn-sm">
-                <ShareIcon className="size-5" />
-              </div>
-            </div>
           ) : (
-            <div className="grid grid-cols-4 gap-2">
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <button
-                  className={`btn btn-disabled btn-circle btn-sm md:btn-md ${views?.some((view) => view.user.id === user?.id) ? "btn-active" : "btn-outline"}`}
-                >
-                  <EyeIcon className="size-5" />
-                </button>
-                {Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  maximumFractionDigits: 1,
-                }).format(views?.length || 0)}
+            <>
+              <div className="carousel w-full overflow-clip rounded-lg">
+                {postData.images.map((image, index) => (
+                  <div
+                    id={`post-${postData.id}-image-${index + 1}`}
+                    className="carousel-item relative w-full"
+                    key={index}
+                  >
+                    <Image
+                      className="w-full cursor-pointer"
+                      src={image.source}
+                      alt={image.alternate || `Preview post image ${index + 1}`}
+                      quality={100}
+                      width={1920}
+                      height={1080}
+                      onClick={handleShowImagesViewer}
+                    />
+                    <ImagesViewer
+                      className="!mt-0"
+                      id={`post-${postData.id}`}
+                      images={postData.images}
+                      ref={ref}
+                    />
+                    <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+                      <Link
+                        href={`#post-${postData.id}-image-${!index ? postData.images.length : index + 1}`}
+                        className="btn btn-circle"
+                      >
+                        <ChevronLeftIcon className="size-5" />
+                      </Link>
+                      <Link
+                        href={`#post-${postData.id}-image-${index + 1 === postData.images.length ? index + 1 : index + 2}`}
+                        className="btn btn-circle"
+                      >
+                        <ChevronRightIcon className="size-5" />
+                      </Link>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <button
-                  className={`btn btn-circle btn-error btn-sm md:btn-md ${liked.active ? "btn-active" : "btn-outline"}`}
-                  onClick={handleLike}
-                >
-                  <HeartIcon
-                    className={`size-5 ${liked.active ? "fill-error-content" : ""}`}
-                  />
-                </button>
-                {Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  maximumFractionDigits: 1,
-                }).format(liked.count)}
+              <div className="flex w-full justify-center gap-2 py-2">
+                {postData.images.map((_image, index) => (
+                  <a
+                    href={`#post-${postData.id}-image-${index + 1}`}
+                    className="btn btn-xs"
+                    key={index}
+                  >
+                    {index + 1}
+                  </a>
+                ))}
               </div>
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <button
-                  className={`btn btn-circle btn-primary btn-sm md:btn-md ${comments?.some((comment) => comment.writer_id === user?.id) ? "btn-active" : "btn-outline"}`}
-                  onClick={handleComment}
-                >
-                  <ChatBubbleBottomCenterIcon
-                    className={`size-5 ${comments?.some((comment) => comment.writer_id === user?.id) ? "fill-primary-content" : ""}`}
-                  />
-                </button>
-                {Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  maximumFractionDigits: 1,
-                }).format(comments?.length || 0)}
-              </div>
-              <div className="flex items-center justify-center gap-2 text-sm">
-                <button
-                  className="btn btn-circle btn-outline btn-primary btn-sm md:btn-md"
-                  onClick={handleShare}
-                >
-                  <ShareIcon className="size-5" />
-                </button>
-                {Intl.NumberFormat("en-US", {
-                  notation: "compact",
-                  maximumFractionDigits: 1,
-                }).format(shares?.length || 0)}
-              </div>
-            </div>
+            </>
           )}
+        </>
+      ) : null}
+      <div className="grid grid-cols-4 gap-2">
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <ViewButton
+            viewCount={postData.view_count}
+            hasViewed={hasViewed}
+            isCompact={isCompact}
+            showCount={showCount}
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <LikeButton
+            user={user}
+            postID={postData.id}
+            likeCount={postData.like_count}
+            hasLiked={hasLiked}
+            isCompact={isCompact}
+            showCount={showCount}
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <CommentButton
+            postID={postData.id}
+            commentCount={postData.comment_count}
+            hasCommented={hasCommented}
+            isCompact={isCompact}
+            showCount={showCount}
+          />
+        </div>
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <ShareButton
+            user={user}
+            postID={postData.id}
+            sharePath={sharePath}
+            facebookHashtag={shareFacebookHashtag}
+            shareXHashtags={shareXHashtags}
+            isCompact={isCompact}
+            showCount={showCount}
+          />
         </div>
       </div>
-      {!isEnded && <div className="divider" />}
     </>
   );
 }

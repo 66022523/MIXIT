@@ -2,6 +2,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { EllipsisVerticalIcon, FlagIcon } from "@heroicons/react/24/outline";
 
+export function Avatar({
+  avatarURL,
+  nickname,
+  fallbackSizeClass = "size-12",
+  width = 48,
+  height = 48,
+}) {
+  return (
+    <div className={`avatar ${avatarURL ? "" : "placeholder"}`}>
+      <div
+        className={`${fallbackSizeClass} rounded-full ${avatarURL ? "" : "bg-neutral text-neutral-content"}`}
+      >
+        {avatarURL ? (
+          <Image alt={nickname} src={avatarURL} width={width} height={height} />
+        ) : (
+          <span>{nickname?.charAt(0)}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function User({
   id,
   avatarURL,
