@@ -8,14 +8,7 @@ export function UserTabLikes({ likes }) {
       {likes?.length ? (
         likes.map((like, index) =>
           like.post ? (
-            <PostTall
-              id={like.post.id}
-              imagesSource={like.post.images[0].source}
-              imagesAlternate={like.post.images[0].alternate}
-              title={like.post.title}
-              content={like.post.content}
-              key={index}
-            />
+            <PostTall postData={like.post} key={index} />
           ) : like.comment ? (
             <CommentTall
               postID={like.comment.post.id}
