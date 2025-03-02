@@ -126,15 +126,15 @@ export default async function CommunitiesLayout({
             <li>
               <Link
                 className="lg:btn-circle lg:mx-auto"
-                href={user ? "/circles/add" : "/sign-in"}
+                href={user ? "/circles/request" : "/sign-in"}
               >
                 <div
                   className="btn btn-circle btn-primary btn-sm tooltip tooltip-bottom inline-flex lg:btn-md"
-                  data-tip="Add Community"
+                  data-tip="Request Circle"
                 >
                   <PlusIcon className="size-6" />
                 </div>
-                <span className="lg:hidden">Add Community</span>
+                <span className="lg:hidden">Request Circle</span>
               </Link>
             </li>
           </ul>
