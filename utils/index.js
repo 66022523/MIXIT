@@ -36,3 +36,10 @@ export function setSearchParamsString(searchParams, name, value) {
 
   return params.toString();
 }
+
+export function slug(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
