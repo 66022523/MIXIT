@@ -37,6 +37,15 @@
   }
 }
 
+/* Tiptap */
+.tiptap p.is-editor-empty:first-child::before {
+  color: oklch(var(--bc));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 /* Hightlight.js */
 .hljs-attr {
   @apply text-primary;
