@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-export default function BoxedTabs({ tabs, tabClass, tabContentClass, active }) {
-  const [active, setActive] = useState(active || tabs[0].id);
+export default function BoxedTabs({ tabs, tabClass, tabContentClass, tabActive }) {
+  const [active, setActive] = useState(tabActive || tabs[0].id);
 
   return (
     <>
