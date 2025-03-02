@@ -170,8 +170,8 @@ export default function RequestCircleForm() {
         </label>
       </div>
       <p>
-        If confirmed, you'll automatically become an admin of this circle and
-        consider you to be a member of this circle.
+        If confirmed, you&apos;ll automatically become an admin of this circle
+        and consider you to be a member of this circle.
       </p>
       <button
         type="submit"
