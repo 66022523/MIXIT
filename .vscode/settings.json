@@ -1,0 +1,7 @@
+{
+  "cSpell.words": ["supabase"],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "MIXIT",
+    "projectKey": "MIXIT"
+  }
+}

@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    scrollbar-gutter: auto !important;
+  }
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+  h4 {
+    @apply text-base;
+  }
+  h5 {
+    @apply text-sm;
+  }
+  h6 {
+    @apply text-xs;
+  }
+}
+
+@layer utilities {
+  .overflow-invisible::-webkit-scrollbar {
+    display: none;
+  }
+  .overflow-invisible {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Tiptap */
+.tiptap p.is-editor-empty:first-child::before {
+  color: oklch(var(--bc));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Hightlight.js */
+.hljs-attr {
+  @apply text-primary;
+}
+.hljs-literal {
+  @apply text-error;
+}
+.hljs-string,
+.hljs-section .hljs-selector-class,
+.hljs-template-variable,
+.hljs-deletion {
+  @apply text-info;
+}
+.hljs,
+.hljs-strong,
+.hljs-emphasis,
+.hljs-subst {
+  @apply text-primary-content;
+}
+.hljs-section,
+.hljs-strong {
+  @apply font-bold;
+}
+.hljs-emphasis {
+  @apply italic;
+}
