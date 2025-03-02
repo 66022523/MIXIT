@@ -32,6 +32,9 @@ const kanit = Kanit({
 export const metadata = {
   title: `${config.metadata.app} - ${config.metadata.short_description}`,
   description: config.metadata.long_description,
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
