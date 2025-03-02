@@ -1,5 +1,6 @@
-import { forwardRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { forwardRef } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 export const ImagesViewer = forwardRef(function ImagesViewer(
@@ -21,19 +22,21 @@ export const ImagesViewer = forwardRef(function ImagesViewer(
             key={index}
           >
             <picture className="relative py-10">
-              <img
+              <Image
                 className="absolute w-full rounded-2xl blur-lg"
                 src={image.source}
-                alt={image.alternate}
-                width="100%"
-                height="100%"
+                alt={image.alternate || `Preview image ${index}`}
+                quality={100}
+                width={1920}
+                height={1080}
               />
-              <img
+              <Image
                 className="relative w-full rounded-2xl"
                 src={image.source}
-                alt={image.alternate}
-                width="100%"
-                height="100%"
+                alt={image.alternate || `Preview image ${index}`}
+                quality={100}
+                width={1920}
+                height={1080}
               />
             </picture>
           </div>

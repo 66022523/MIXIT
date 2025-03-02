@@ -2,9 +2,11 @@ import Link from "next/link";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 export function Section({
+  sectionClass,
   backLink,
   id,
   Icon,
+  iconClass,
   inline,
   title,
   description,
@@ -14,19 +16,26 @@ export function Section({
   children,
 }) {
   return (
-    <div className="flex items-center gap-2" id={id}>
-      {backLink && (
-        <Link href={backLink} className="btn btn-circle btn-ghost">
-          <ChevronLeftIcon className="size-5" />
-        </Link>
-      )}
-      <Icon className="size-8 rounded-full bg-primary p-2 text-primary-content" />
-      <div className={inline && "flex items-center gap-2"}>
-        <h2 className="font-bold">{title}</h2>
-        {description && <p className={descriptionClass}>{description}</p>}
-        {hint && <small className={hintClass}>{hint}</small>}
+    <div className={sectionClass ?? "flex items-center justify-between gap-2"} id={id}>
+      <div className="flex items-center gap-2">
+        {backLink && (
+          <Link href={backLink} className="btn btn-circle btn-ghost">
+            <ChevronLeftIcon className="size-5" />
+          </Link>
+        )}
+        <Icon
+          className={
+            iconClass ??
+            "size-8 rounded-full bg-primary p-2 text-primary-content"
+          }
+        />
+        <div className={inline && "flex items-center gap-2"}>
+          <h2 className="font-bold">{title}</h2>
+          {description && <p className={descriptionClass}>{description}</p>}
+          {hint && <small className={hintClass}>{hint}</small>}
+        </div>
       </div>
-      {children}
+      <div className="flex items-center gap-2">{children}</div>
     </div>
   );
 }
