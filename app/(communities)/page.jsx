@@ -11,15 +11,37 @@ import { Placeholder } from "@/components/empty";
 import { Circle, CirclePlaceholder } from "@/components/circle";
 import { Post, PostPlaceholder } from "@/components/post";
 
-import { getUser } from "@/libs/queries/auth";
 import { getCircles } from "@/libs/queries/circles";
 import { getPosts } from "@/libs/queries/posts";
+import {
+  getUserComments,
+  getUserFollowing,
+  getUserLikes,
+  getUserViews,
+} from "@/libs/queries/users";
+
+import { createClient } from "@/utils/supabase/server";
 
 export default async function Communities() {
-  const { user } = await getUser();
-  const [{ data: circlesData }, { data: postsData }] = await Promise.all([
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [
+    { data: circlesData },
+    { data: postsData },
+    { data: userViewsData },
+    { data: userLikesData },
+    { data: userCommentsData },
+    { data: userFollowingData },
+  ] = await Promise.all([
     getCircles(),
     getPosts(),
+    getUserViews(user?.id, user),
+    getUserLikes(user?.id),
+    getUserComments(user?.id),
+    getUserFollowing(user?.id),
   ]);
 
   return (
@@ -60,7 +82,7 @@ export default async function Communities() {
             <ChevronRightIcon className="size-5 rounded-full bg-primary p-1 text-primary-content" />
           </Link>
         </div>
-        {circlesData.length ? (
+        {circlesData?.length ? (
           <div className="carousel carousel-center relative w-full space-x-4 rounded-box bg-base-100 p-4 hover:overflow-x-scroll">
             {circlesData.map((circle, index) => (
               <div className="carousel-item" key={index}>
@@ -88,32 +110,26 @@ export default async function Communities() {
           </Placeholder>
         )}
         <Section Icon={Bars3BottomLeftIcon} title="Posts" />
-        {postsData.length ? (
+        {postsData?.length ? (
           <div className="rounded-2xl bg-base-100">
             {postsData.map((post, index) => (
-              <Post
-                user={user}
-                id={post.id}
-                createdAt={post.created_at}
-                title={post.title}
-                content={post.content}
-                tags={post.tags}
-                images={post.images}
-                view={post.views}
-                likes={post.likes}
-                comments={post.comments}
-                shares={post.shares}
-                writerID={post.writer?.id}
-                writerAvatarURL={post.writer?.avatar_url}
-                writerNickname={post.writer?.nickname}
-                writerRole={post.writer?.role}
-                circleID={post.circle?.id}
-                circleIconURL={post.circle?.icon_url}
-                circleName={post.circle?.name}
-                isEnded={index + 1 === postsData.length}
-                isPreview={true}
-                key={index}
-              />
+              <>
+                <div className="card" key={index}>
+                  <div className="card-body">
+                    <Post
+                      user={user}
+                      postData={post}
+                      userViewsData={userViewsData}
+                      userLikesData={userLikesData}
+                      userCommentsData={userCommentsData}
+                      userFollowingData={userFollowingData}
+                      showCount
+                      isPreview={true}
+                    />
+                  </div>
+                </div>
+                {index + 1 !== postsData.length && <div className="divider" />}
+              </>
             ))}
           </div>
         ) : (

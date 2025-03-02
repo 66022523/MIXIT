@@ -1,9 +1,3 @@
-import { Sidebar } from "@/components/layouts/sidebar";
-import { Section } from "@/components/section";
-import { Post } from "@/components/post";
-
-import { getUser } from "@/libs/queries/auth";
-import { getCircle } from "@/libs/queries/circles";
 import {
   UsersIcon,
   PlusCircleIcon,
@@ -11,13 +5,46 @@ import {
   Bars3BottomLeftIcon,
   MinusCircleIcon,
 } from "@heroicons/react/24/solid";
-import { getUserCircles } from "@/libs/queries/users";
+
+import { Sidebar } from "@/components/layouts/sidebar";
+import { Section } from "@/components/section";
+import { Post } from "@/components/post";
+
+import { getCircle } from "@/libs/queries/circles";
+import {
+  getUserCircles,
+  getUserComments,
+  getUserFollowing,
+  getUserLikes,
+  getUserViews,
+} from "@/libs/queries/users";
+
+import { createClient } from "@/utils/supabase/server";
+import { Fragment } from "react";
 
 export default async function Circle({ params }) {
   const { id } = await params;
-  const { user } = await getUser();
-  const { data: circleData } = await getCircle(id);
-  const { data: userCircleData } = await getUserCircles(user?.id);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [
+    { data: circleData },
+    { data: userCirclesData },
+    { data: userViewsData },
+    { data: userLikesData },
+    { data: userCommentsData },
+    { data: userFollowingData },
+  ] = await Promise.all([
+    getCircle(id),
+    getUserCircles(user?.id),
+    getUserViews(user?.id, user),
+    getUserLikes(user?.id),
+    getUserComments(user?.id),
+    getUserFollowing(user?.id),
+  ]);
 
   return circleData ? (
     <>
@@ -30,7 +57,10 @@ export default async function Circle({ params }) {
         <div className="hero-overlay bg-opacity-60" />
         <div className="hero-content h-52 w-full flex-col items-end justify-between p-5 text-neutral-content lg:flex-row">
           <div className="space-y-2">
-            <h1 className="text-5xl font-bold">{circleData.name}</h1>
+            <div>
+              <span className="text-lg">{circleData.developer}</span>
+              <h1 className="text-5xl font-bold">{circleData.name}</h1>
+            </div>
             <div className="badge badge-lg gap-2 pl-0">
               <div className="badge badge-primary badge-lg gap-2">
                 <UsersIcon className="size-4" />
@@ -40,7 +70,7 @@ export default async function Circle({ params }) {
             </div>
           </div>
           <div className="space-x-2">
-            {userCircleData.find(
+            {userCirclesData.some(
               (userCircle) => userCircle.id === circleData.id,
             ) ? (
               <button className="btn btn-error">
@@ -62,32 +92,26 @@ export default async function Circle({ params }) {
       </div>
       <Sidebar>
         <Section Icon={Bars3BottomLeftIcon} title="Posts" />
-        <div className="card bg-base-100">
+        <div className="rounded-2xl bg-base-100">
           {circleData.posts?.length
             ? circleData.posts.map((post, index) => (
-                <Post
-                  user={user}
-                  id={post.id}
-                  createdAt={post.created_at}
-                  title={post.title}
-                  content={post.content}
-                  tags={post.tags}
-                  images={post.images}
-                  view={post.views}
-                  likes={post.likes}
-                  comments={post.comments}
-                  shares={post.shares}
-                  writerID={post.writer?.id}
-                  writerAvatarURL={post.writer?.avatar_url}
-                  writerNickname={post.writer?.nickname}
-                  writerRole={post.writer?.role}
-                  circleID={post.circle?.id}
-                  circleIconURL={post.circle?.icon_url}
-                  circleName={post.circle?.name}
-                  isEnded={index + 1 === circleData.posts.length}
-                  isPreview={true}
-                  key={index}
-                />
+                <Fragment key={index}>
+                  <div className="card">
+                    <div className="card-body">
+                      <Post
+                        user={user}
+                        postData={post}
+                        userViewsData={userViewsData}
+                        userLikesData={userLikesData}
+                        userCommentsData={userCommentsData}
+                        userFollowingData={userFollowingData}
+                        isEnded={index + 1 === circleData.posts.length}
+                        isPreview={true}
+                      />
+                    </div>
+                  </div>
+                  {index + 1 !== post.length && <div className="divider" />}
+                </Fragment>
               ))
             : null}
         </div>

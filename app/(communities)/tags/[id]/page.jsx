@@ -1,14 +1,38 @@
-import { HashtagIcon, TagIcon } from "@heroicons/react/24/solid";
+import { HashtagIcon } from "@heroicons/react/24/solid";
 
 import { Post } from "@/components/post";
 
-import { getUser } from "@/libs/queries/auth";
 import { getTag } from "@/libs/queries/tags";
+import {
+  getUserComments,
+  getUserFollowing,
+  getUserLikes,
+  getUserViews,
+} from "@/libs/queries/users";
+
+import { createClient } from "@/utils/supabase/server";
 
 export default async function Tag({ params }) {
   const { id } = await params;
-  const { user } = await getUser();
-  const { data: tagData } = await getTag(id);
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [
+    { data: tagData },
+    { data: userViewsData },
+    { data: userLikesData },
+    { data: userCommentsData },
+    { data: userFollowingData },
+  ] = await Promise.all([
+    getTag(id),
+    getUserViews(user?.id, user),
+    getUserLikes(user?.id),
+    getUserComments(user?.id),
+    getUserFollowing(user?.id),
+  ]);
 
   return (
     <>
@@ -27,23 +51,11 @@ export default async function Tag({ params }) {
           ? tagData.posts.map((post, index) => (
               <Post
                 user={user}
-                id={post.id}
-                createdAt={post.created_at}
-                title={post.title}
-                content={post.content}
-                tags={post.tags}
-                images={post.images}
-                view={post.views}
-                likes={post.likes}
-                comments={post.comments}
-                shares={post.shares}
-                writerID={post.writer?.id}
-                writerAvatarURL={post.writer?.avatar_url}
-                writerNickname={post.writer?.nickname}
-                writerRole={post.writer?.role}
-                circleID={post.circle?.id}
-                circleIconURL={post.circle?.icon_url}
-                circleName={post.circle?.name}
+                postData={post}
+                userViewsData={userViewsData}
+                userLikesData={userLikesData}
+                userCommentsData={userCommentsData}
+                userFollowingData={userFollowingData}
                 isEnded={index + 1 === tagData.posts.length}
                 key={index}
               />

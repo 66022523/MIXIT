@@ -7,9 +7,21 @@ import config from "@/configs";
 import { Section } from "@/components/section";
 
 import { getCircles } from "@/libs/queries/circles";
+import { getUserCircles } from "@/libs/queries/users";
+
+import { createClient } from "@/utils/supabase/server";
+import { UsersIcon } from "@heroicons/react/24/outline";
 
 export default async function Circles() {
-  const { data: circlesData } = await getCircles();
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  const [{ data: circlesData }, { data: userCirclesData }] = await Promise.all([
+    getCircles(),
+    getUserCircles(user?.id),
+  ]);
 
   return (
     <>
@@ -64,8 +76,26 @@ export default async function Circles() {
             <div className="card-body">
               <h2 className="card-title">{circle.name}</h2>
               <p className="line-clamp-3">{circle.description}</p>
+              <span className="flex items-center gap-1 text-gray-400">
+                <UsersIcon className="size-4" />
+                {Intl.NumberFormat("en-US", {
+                  notation: "compact",
+                  maximumFractionDigits: 1,
+                }).format(circle.member_count || 0)}
+              </span>
               <div className="card-actions">
-                <button className="btn btn-primary btn-block">View</button>
+                <button
+                  className="btn btn-primary btn-block"
+                  disabled={userCirclesData.some(
+                    (userCircle) => userCircle.id === circle.id,
+                  )}
+                >
+                  {userCirclesData.some(
+                    (userCircle) => userCircle.id === circle.id,
+                  )
+                    ? "Joined"
+                    : "Join"}
+                </button>
               </div>
             </div>
           </Link>
