@@ -8,19 +8,20 @@ export function UserTabViews({ views }) {
       {views?.length ? (
         views.map((view, index) =>
           view.post ? (
-            <PostTall
-              id={view.post.id}
-              imagesSource={view.post.images ? view.post.images[0].source : ""}
-              imagesAlternate={view.post.images ? view.post.images[0].alternate : ""}
-              title={view.post.title}
-              content={view.post.content}
-              key={index}
-            />
+            <PostTall postData={view.post} showCount key={index} />
           ) : view.comment ? (
             <CommentTall
               postID={view.comment.post.id}
-              postImageSource={view.comment.post.images ? view.comment.post.images[0].source : ""}
-              postImageAlternate={view.comment.post.images ? view.comment.post.images[0].alternate : ""}
+              postImageSource={
+                view.comment.post.images
+                  ? view.comment.post.images[0].source
+                  : ""
+              }
+              postImageAlternate={
+                view.comment.post.images
+                  ? view.comment.post.images[0].alternate
+                  : ""
+              }
               postTitle={view.comment.post.title}
               postContent={view.comment.post.content}
               commentID={view.comment.id}
