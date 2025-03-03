@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import {
   Bars3BottomLeftIcon,
   ChevronRightIcon,
@@ -113,8 +114,8 @@ export default async function Communities() {
         {postsData?.length ? (
           <div className="rounded-2xl bg-base-100">
             {postsData.map((post, index) => (
-              <>
-                <div className="card" key={index}>
+              <Fragment key={index}>
+                <div className="card">
                   <div className="card-body">
                     <Post
                       user={user}
@@ -129,7 +130,7 @@ export default async function Communities() {
                   </div>
                 </div>
                 {index + 1 !== postsData.length && <div className="divider" />}
-              </>
+              </Fragment>
             ))}
           </div>
         ) : (
