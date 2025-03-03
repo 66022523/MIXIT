@@ -39,10 +39,11 @@ export function Placeholder({ className, icon, title, description, children }) {
   );
 }
 
-export function Empty({ description }) {
+export function Empty({ title, description }) {
   return (
     <div className="items-center space-y-2 p-10 text-center">
       <CubeTransparentIcon className="mx-auto size-12 text-gray-400" />
+      <h1>{title}</h1>
       <p>{description}</p>
     </div>
   );
