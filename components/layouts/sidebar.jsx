@@ -28,7 +28,7 @@ export async function Sidebar({ className, children }) {
         {children}
       </div>
       <aside className="sticky bottom-0 col-span-4 space-y-4 lg:col-span-1 lg:space-y-12">
-        {circlesData.length ? (
+        {circlesData?.length ? (
           <div className="carousel w-full">
             {circlesData.map((circle, index) => {
               return (
