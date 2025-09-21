@@ -112,9 +112,7 @@ export function UserTabs({
         <div className="flex items-center gap-2">
           <div className="badge badge-lg gap-2 border-none pl-0">
             <div className="badge badge-primary badge-lg gap-2">
-              {profile[
-                tabOptions.find((option) => option.value === active).value
-              ]?.length || 0}
+              {profile[`${active}_count`] || 0}
             </div>
             {tabOptions.find((option) => option.value === active).name}
           </div>
