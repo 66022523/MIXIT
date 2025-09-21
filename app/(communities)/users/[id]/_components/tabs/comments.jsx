@@ -8,8 +8,12 @@ export function UserTabComments({ comments }) {
         comments.map((comment, index) => (
           <CommentTall
             postID={comment.post.id}
-            postImageSource={comment.post.images[0].source}
-            postImageAlternate={comment.post.images[0].alternate}
+            postImageSource={
+              comment.post.images ? comment.post.images[0].source : null
+            }
+            postImageAlternate={
+              comment.post.images ? comment.post.images[0].alternate : null
+            }
             postTitle={comment.post.title}
             postContent={comment.post.content}
             commentID={comment.id}
